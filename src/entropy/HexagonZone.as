@@ -8,21 +8,35 @@ package entropy {
 	
 	public class HexagonZone extends MultiZone {
 		private static const SQRT_3_2:Number = Math.sqrt(3) / 2;
+		
+		/**
+		 * Points defining a hexagon with radius 1.
+		 */
 		private static const UNIT_HEXAGON_POINTS:Vector.<Point> = Vector.<Point>([
-				new Point(1, 0),
-				new Point(0.5, SQRT_3_2),
-				new Point(-0.5, SQRT_3_2),
-				new Point(-1, 0),
-				new Point(-0.5, -SQRT_3_2),
-				new Point(0.5, -SQRT_3_2)]);
+				new Point(1, 0), //right
+				new Point(0.5, SQRT_3_2), //lower right
+				new Point(-0.5, SQRT_3_2), //lower left
+				new Point(-1, 0), //left
+				new Point(-0.5, -SQRT_3_2), //upper left
+				new Point(0.5, -SQRT_3_2)]); //upper right
 		
 		private var centerX:Number;
 		private var centerY:Number;
-		private var radius:Number;
-		private var apothem:Number; //aka. "inradius"
 		
 		/**
-		 * @param	radius The distance from the center to any of the corners.
+		 * The distance from the center to a corner. Equals the length of
+		 * each side.
+		 */
+		private var radius:Number;
+		
+		/**
+		 * The distance from the center to the middle of a side. Also
+		 * known as the "inradius."
+		 */
+		private var apothem:Number;
+		
+		/**
+		 * @param	radius The distance from the center to a corner.
 		 */
 		public function HexagonZone(centerX:Number = 0, centerY:Number = 0, radius:Number = 0) {
 			this.centerX = centerX;
