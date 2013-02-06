@@ -63,7 +63,7 @@ package entropy {
 		}
 		
 		private function addWall(x:Number, y:Number):void {
-			emitter.addAction(new CollisionZone(new HexagonZone(x, y, 23)));
+			emitter.addAction(new CollisionZone(new HexagonZone(x, y, 21)));
 			
 			var wallBitmap:Bitmap = new Bitmap(wallImage);
 			wallBitmap.x = x - wallImage.width / 2;
