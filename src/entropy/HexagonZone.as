@@ -144,6 +144,8 @@ package entropy {
 				}*/
 			}
 			
+			//now that the particle is known to be close to the hexagon,
+			//test it against the individual line segments and points
 			return super.collideParticle(particle, bounce);
 		}
 	}
