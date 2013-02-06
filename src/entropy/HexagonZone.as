@@ -7,7 +7,7 @@ package entropy {
 	import org.flintparticles.twoD.zones.Zone2D;
 	
 	public class HexagonZone extends MultiZone {
-		private static const SQRT_3_2:Number = Math.sqrt(3) / 2;
+		public static const SQRT_3_2:Number = Math.sqrt(3) / 2;
 		
 		/**
 		 * Points defining a hexagon with radius 1.
@@ -34,6 +34,11 @@ package entropy {
 		 * known as the "inradius."
 		 */
 		private var apothem:Number;
+		
+		/**
+		 * Whether this will collide with particles.
+		 */
+		public var collisionEnabled:Boolean = true;
 		
 		/**
 		 * @param	radius The distance from the center to a corner.
@@ -97,6 +102,10 @@ package entropy {
 		}
 		
 		public override function collideParticle(particle:Particle2D, bounce:Number = 1):Boolean {
+			if(!collisionEnabled) {
+				return false;
+			}
+			
 			var xDiff:Number = particle.x - centerX;
 			var yDiff:Number = particle.y - centerY;
 			
