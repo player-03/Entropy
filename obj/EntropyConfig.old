@@ -32,15 +32,15 @@
     </define>
     <verbose-stacktraces>true</verbose-stacktraces>
     <source-path append="true">
-      <path-element>C:\Users\Joseph\git\Entropy\src</path-element>
-      <path-element>C:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
+      <path-element>C:\Users\anestt\Documents\TOMcoursework\ExperimentalGameDesign\team3tempproj\src</path-element>
+      <path-element>C:\Program Files\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
     <library-path append="true">
-      <path-element>C:\Users\Joseph\git\Entropy\lib\Flint2d_4.0.1.swc</path-element>
+      <path-element>C:\Users\anestt\Documents\TOMcoursework\ExperimentalGameDesign\team3tempproj\lib\Flint2d_4.0.1.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>
-    <path-element>C:\Users\Joseph\git\Entropy\src\entropy\Main.as</path-element>
+    <path-element>C:\Users\anestt\Documents\TOMcoursework\ExperimentalGameDesign\team3tempproj\src\entropy\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>30</default-frame-rate>

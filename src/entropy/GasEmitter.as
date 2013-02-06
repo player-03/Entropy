@@ -20,34 +20,35 @@ package entropy {
 		private static const OFFSCREEN_LEEWAY:Number = 200;
 		
 		[Embed(source="../../lib/img/GasParticle.png")]
-		private var GasParticle:Class;
+		private var GasParticle:Class;//declare a class to hold the image
 		
 		private var blast:Blast;
 		private var position:Position;
 		
 		public function GasEmitter() {
-			super();
-			
+			super();//call constructor of the object it extends
 			blast = new Blast();
 			counter = blast;
 			
-			var image:Bitmap = new GasParticle() as Bitmap;
+			var image:Bitmap = new GasParticle() as Bitmap;//the gas particle
 			image.scaleX = image.scaleY = 0.4;
 			image.x = -image.width / 2;
 			image.y = -image.height / 2;
 			var imageContainer:Sprite = new Sprite();
-			imageContainer.addChild(image);
+			imageContainer.addChild(image);//scale the image move its bitmap to the top left of the particle and add it to the display object that holds all
+			//particle images
 			
 			position = new Position();
 			
 			addInitializer(position);
-			addInitializer(new SharedImage(imageContainer));
-			addInitializer(new Velocity(new DiscZone(null, 40, 40)));
-			addInitializer(new CollisionRadiusInit(4));
+			addInitializer(new SharedImage(imageContainer));//all particle display objects share the image container?
+			addInitializer(new Velocity(new DiscZone(null, 40, 40)));//tell the particles to travel at speed 40 per sec toward a random point on a circle
+			//relative to 
+			addInitializer(new CollisionRadiusInit(4));//there is a radius of 4 pixels around each particle that defines their collision bounding
 			
-			addAction(new Move());
-			addAction(new Collide());
-			addAction(new GravityWell(50, Main.STAGE_WIDTH / 2, Main.STAGE_HEIGHT / 2, 300));
+			addAction(new Move());//tell the particles to move based on the velocity in the initializer
+			addAction(new Collide());//tell the particles that they should collide with things based on thier initializer
+			addAction(new GravityWell(50, Main.STAGE_WIDTH / 2, Main.STAGE_HEIGHT / 2, 300));//tells the particles to be attracted back toward the center
 			
 			//this will remove particles that go too far offscreen
 			addAction(new DeathZone(new RectangleZone(-OFFSCREEN_LEEWAY, -OFFSCREEN_LEEWAY,
@@ -59,7 +60,7 @@ package entropy {
 			//					Main.STAGE_WIDTH, Main.STAGE_HEIGHT)));
 		}
 		
-		public function emitFrom(count:uint, zone:Zone2D):void {
+		public function emitFrom(count:uint, zone:Zone2D):void {//burst emit at zone
 			blast.startCount = count;
 			position.zone = zone;
 			start();
