@@ -37,6 +37,9 @@ package entropy {
 		 */
 		private var wallContainer:Sprite;
 		
+		public function Main() {
+			if(stage) init();
+			else addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
 		private function init(e:Event = null):void {
