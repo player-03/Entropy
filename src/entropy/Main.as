@@ -12,6 +12,8 @@ package entropy {
 	import org.flintparticles.twoD.zones.LineZone;
 	import org.flintparticles.twoD.zones.MultiZone;
 	
+	import flash.net.registerClassAlias;
+	
 	[Frame(factoryClass="entropy.Preloader")]
 	public class Main extends Sprite {
 		public static const STAGE_WIDTH:int = 640;//describe stage hight and width
@@ -28,6 +30,13 @@ package entropy {
 		private var wallImage:BitmapData;
 		
 		public function Main() {//starting function for program
+			
+			//http://stackoverflow.com/questions/10175810/deep-copy-of-vector-in-as3.
+			//http://stackoverflow.com/questions/5800620/deep-cloning-in-actionscript
+			//registerClassAlias("flash.geom.Point", Point);
+			registerClassAlias("entropy.HexagonZone", HexagonZone);//we apparently need to register the hexagon zone class so that its type data is maintained
+			//when deep copying an array in the helper functions of hexgrid
+			
 			if(stage) init();//if the stage is up then init
 			else addEventListener(Event.ADDED_TO_STAGE, init);//otherwise wait for the stage
 		}
