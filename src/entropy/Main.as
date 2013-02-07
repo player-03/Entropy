@@ -2,9 +2,12 @@ package entropy {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
+	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 	import org.flintparticles.twoD.actions.CollisionZone;
 	import org.flintparticles.twoD.renderers.BitmapRenderer;
 	import org.flintparticles.twoD.zones.BitmapDataZone;
@@ -19,6 +22,8 @@ package entropy {
 		
 		private var renderer:BitmapRenderer;
 		private var emitter:GasEmitter;//utilizing a single emitter for now with 
+		
+		private var player:Sprite;
 		
 		private var wallShape:Vector.<Point>;
 		private var wallContainer:Sprite;
@@ -39,6 +44,9 @@ package entropy {
 			graphics.drawRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);//black out the stage
 			graphics.endFill();//resolve
 			
+			player = new Player();
+			addChild(player);
+
 			wallImage = (new Wall() as Bitmap).bitmapData;//declare that the wall image is the bitmap data for the wall class
 			
 			wallContainer = new Sprite();//a display object that contains all wall hexagons
