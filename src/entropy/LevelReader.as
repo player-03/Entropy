@@ -80,6 +80,8 @@ package entropy
 		{
 			return null;
 		}
+		
+		
 	
 	//random map functions: 
 	
@@ -97,7 +99,6 @@ package entropy
 			{
 				return null;
 			}
-			
 			var r:int, c:int;
 			var rVal:Vector.<Vector.<HexTile>> = new Vector.<Vector.<HexTile>>(height)
 			var row:Vector.<HexTile>;
@@ -110,14 +111,21 @@ package entropy
 					row[c] = new HexTile(null, emitter, LevelReader.getTileType(c, r, aRadSq, asteroidCenterX, asteroidCenterY), c, r);
 				}
 			}
-			
 			return rVal;
 		}
 		
+		
+	
+
+//-------------------------------------------------------------------------------
+	//protected functions
+	
+	
+//-------------------------------------------------------------------------------
+	//private functions
+	
 		private static function getTileType(column:int, row:int, aRadSq:Number, asteroidCenterX:int, asteroidCenterY:int):int
 		{
-			
-			
 			var xDiff:int = HexGrid.columnToX(column) - asteroidCenterX;
 			var yDiff:int = HexGrid.columnRowToY(column, row) - asteroidCenterY;
 			if(Math.random() < 0.95 && xDiff * xDiff + yDiff * yDiff <= aRadSq)
@@ -129,15 +137,6 @@ package entropy
 				return HexTile.SPACE;
 			}
 		}
-	
-
-//-------------------------------------------------------------------------------
-	//protected functions
-	
-	
-//-------------------------------------------------------------------------------
-	//private functions
-	
 	
 		
 	}
