@@ -1,6 +1,8 @@
 package entropy {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import org.flintparticles.common.emitters.Emitter;
+	import org.flintparticles.twoD.actions.CollisionZone;
 	
 	/**
 	 * Data relating to a single tile in the hex grid.
@@ -97,24 +99,47 @@ package entropy {
 			return type == FILLED || type == VALVE_CLOSED;
 		}
 		
+		///////////////////////////////////////////////////////////////////////////
+		
+		private var grid:HexGrid;
+		
+		private var mColumn:int;
+		private var mRow:int;
+		
 		private var mType:uint;
 		private var collisionZone:HexagonZone;
 		
-		public function HexTile(type:uint, x:Number, y:Number) {
+		public function HexTile(grid:HexGrid, emitter:Emitter, type:uint,
+								column:int, row:int) {
 			super(getBitmapData(type));
 			visible = bitmapData != null;
 			
-			this.x = x - TILE_WIDTH / 2;
-			this.y = y - TILE_HEIGHT / 2;
+			this.grid = grid;
+			
+			mColumn = column;
+			mRow = row;
+			
+			x = grid.columnToX(column);
+			y = grid.columnRowToY(column, row);
 			
 			mType = type;
 			
 			//collision data may be necessary for any tile type except
 			//space, so create the zone now
 			if(mType != SPACE) {
-				collisionZone = new HexagonZone(x, y, TILE_WIDTH / 2);
+				collisionZone = new HexagonZone(x + TILE_WIDTH / 2,
+												y + TILE_HEIGHT / 2,
+												TILE_WIDTH / 2 - 2);
 				collisionZone.collisionEnabled = typeCollides(mType);
+				emitter.addAction(new CollisionZone(collisionZone));
 			}
+		}
+		
+		public function get column():int {
+			return mColumn;
+		}
+		public function get row():int {
+			return mRow;
 		}
 		
 		public function get type():uint {
