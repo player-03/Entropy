@@ -4,19 +4,30 @@ package entropy
 	import fl.controls.Button;
 	import fl.controls.Label;
 	import fl.controls.TextInput;
+	import flash.net.FileReference;
 
+	//class written with guidance from http://www.adobe.com/devnet/flash/quickstart/filereference_class_as3.html
+	
+	
 	public class titleScreen extends Sprite
 	{
+		
+//---------------------------------------------------------------------------------------------------------
+//public properties
 		public static const tText:String = "AsteroidMiner";
-		public static const lText:String = "load";
-		public static const sText:String = "play";
+		public static const lbText:String = "load";
+		public static const sbText:String = "play";
+		public static const lsText:String = "LOADING";
+//private properties
+		private var m_inString:String;
+		private var m_sButton:Button;
+		private var m_lButton:Button;
+		private var m_inBox:TextInput;
+		private var m_ref:FileReference;
+		private var m_loadLabel:Label;
 		
-		private var inString:String;
-		private var sButton:Button;
-		private var lButton:Button;
-		private var inBox:TextInput;
-		
-		public function titleScreen() 
+//--------------------------------------------------------------------------------------------------------------
+		public function titleScreen(fRef:FileReference) 
 		{
 			super();
 			/*
@@ -60,10 +71,15 @@ package entropy
 				stage.addChild(ControlLayer);
 				stop();
 			*/
-			inString = null
-			sButton = null;
-			lButton = null;
-			inString = "";
+			m_inBox = null;
+			m_sButton = null;
+			m_lButton = null;
+			m_inString = "";
+		}
+		
+		public function get inString():String
+		{
+			return "";
 		}
 		
 	}
