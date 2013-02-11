@@ -1,6 +1,8 @@
 package entropy {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import org.flintparticles.common.emitters.Emitter;
+	import org.flintparticles.twoD.actions.CollisionZone;
 	
 	/**
 	 * Data relating to a single tile in the hex grid.
@@ -9,7 +11,7 @@ package entropy {
 		/**
 		 * The distance from the left vertex to the right vertex of the tile.
 		 */
-		public static const TILE_WIDTH:int = 46;
+		public static const TILE_WIDTH:int = 36;
 		
 		/**
 		 * The difference between x values of each column of tiles. This
@@ -22,7 +24,10 @@ package entropy {
 		 * Equals the difference between y values of tiles directly above
 		 * and below one another.
 		 */
-		public static const TILE_HEIGHT:int = 41;
+		public static const TILE_HEIGHT:int = 31;
+		
+		public static const IMAGE_WIDTH:int = 46;
+		public static const IMAGE_HEIGHT:int = 41;
 		
 		/**
 		 * Represents a space outside the asteroid. Nothing can be placed
@@ -71,10 +76,10 @@ package entropy {
 		private static var emptyBitmapData:BitmapData;
 		
 		private static function checkData(data:BitmapData):void {
-			if(data.width != TILE_WIDTH
-					|| data.height != TILE_HEIGHT) {
-				throw new Error("TILE_WIDTH and TILE_HEIGHT are not up to date!\n"
-							+ "TILE_WIDTH is " + TILE_WIDTH + " and TILE_HEIGHT is " + TILE_HEIGHT
+			if(data.width != IMAGE_WIDTH
+					|| data.height != IMAGE_HEIGHT) {
+				throw new Error("IMAGE_WIDTH and IMAGE_HEIGHT are not up to date!\n"
+							+ "IMAGE_WIDTH is " + IMAGE_WIDTH + " and IMAGE_HEIGHT is " + IMAGE_HEIGHT
 							+ ", but they should be " + data.width + " and " + data.height + ".");
 			}
 		}
@@ -97,28 +102,67 @@ package entropy {
 			return type == FILLED || type == VALVE_CLOSED;
 		}
 		
+		///////////////////////////////////////////////////////////////////////////
+		
+		private var m_grid:HexGrid;
+		
+		private var mColumn:int;
+		private var mRow:int;
+		
 		private var mType:uint;
 		private var collisionZone:HexagonZone;
 		
-		public function HexTile(type:uint, x:Number, y:Number) {
+		public function HexTile(gridItem:HexGrid, emitter:Emitter, type:uint,
+								column:int, row:int) {
 			super(getBitmapData(type));
 			visible = bitmapData != null;
 			
-			this.x = x - TILE_WIDTH / 2;
-			this.y = y - TILE_HEIGHT / 2;
+			this.m_grid = gridItem;
+			
+			mColumn = column;
+			mRow = row;
+			/*
+			if (grid === null)
+			{
+				x = HexGrid.columnToX(column);
+				y = HexGrid.columnRowToY(column, row);
+			}
+			else
+			{
+				x = grid.columnToX(column);
+				y = grid.columnRowToY(column, row);
+			}
+			*/
+			x = HexGrid.columnToX(column);
+			y = HexGrid.columnRowToY(column, row);
 			
 			mType = type;
 			
 			//collision data may be necessary for any tile type except
 			//space, so create the zone now
 			if(mType != SPACE) {
-				collisionZone = new HexagonZone(x, y, TILE_WIDTH / 2);
+				collisionZone = new HexagonZone(x + TILE_WIDTH / 2,
+												y + TILE_HEIGHT / 2,
+												TILE_WIDTH / 2 - 2);
 				collisionZone.collisionEnabled = typeCollides(mType);
+				emitter.addAction(new CollisionZone(collisionZone));
 			}
+		}
+		
+		public function get column():int {
+			return mColumn;
+		}
+		public function get row():int {
+			return mRow;
 		}
 		
 		public function get type():uint {
 			return mType;
+		}
+		
+		public function get grid():HexGrid
+		{
+			return this.m_grid;
 		}
 		
 		public function set type(value:uint):void {
@@ -134,6 +178,12 @@ package entropy {
 			if(collisionZone != null) {
 				collisionZone.collisionEnabled = typeCollides(mType);
 			}
+		}
+		
+		public function set grid(value:HexGrid):void//try to set the grid of the item
+		{
+			this.m_grid = value;
+			//return true;
 		}
 		
 		public function getCollisionZone():HexagonZone {
