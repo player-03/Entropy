@@ -104,7 +104,7 @@ package entropy {
 		
 		///////////////////////////////////////////////////////////////////////////
 		
-		private var grid:HexGrid;
+		private var m_grid:HexGrid;
 		
 		private var mColumn:int;
 		private var mRow:int;
@@ -112,18 +112,29 @@ package entropy {
 		private var mType:uint;
 		private var collisionZone:HexagonZone;
 		
-		public function HexTile(grid:HexGrid, emitter:Emitter, type:uint,
+		public function HexTile(gridItem:HexGrid, emitter:Emitter, type:uint,
 								column:int, row:int) {
 			super(getBitmapData(type));
 			visible = bitmapData != null;
 			
-			this.grid = grid;
+			this.m_grid = gridItem;
 			
 			mColumn = column;
 			mRow = row;
-			
-			x = grid.columnToX(column);
-			y = grid.columnRowToY(column, row);
+			/*
+			if (grid === null)
+			{
+				x = HexGrid.columnToX(column);
+				y = HexGrid.columnRowToY(column, row);
+			}
+			else
+			{
+				x = grid.columnToX(column);
+				y = grid.columnRowToY(column, row);
+			}
+			*/
+			x = HexGrid.columnToX(column);
+			y = HexGrid.columnRowToY(column, row);
 			
 			mType = type;
 			
@@ -149,6 +160,11 @@ package entropy {
 			return mType;
 		}
 		
+		public function get grid():HexGrid
+		{
+			return this.m_grid;
+		}
+		
 		public function set type(value:uint):void {
 			//you cannot change space tiles
 			if(mType == SPACE) {
@@ -162,6 +178,12 @@ package entropy {
 			if(collisionZone != null) {
 				collisionZone.collisionEnabled = typeCollides(mType);
 			}
+		}
+		
+		public function set grid(value:HexGrid):void//try to set the grid of the item
+		{
+			this.m_grid = value;
+			//return true;
 		}
 		
 		public function getCollisionZone():HexagonZone {
