@@ -31,6 +31,9 @@ package entropy {
 		
 		private var wallShape:Vector.<Point>;
 		private var wallContainer:Sprite;
+		
+		[Embed(source="../../lib/img/Wall.png")]
+		private var Wall:Class;
 		/**
 		 * Currently the only emitter, because using multiple emitters
 		 * would require registering the same collision data with each
@@ -42,7 +45,7 @@ package entropy {
 		 * A "container" display object is intended to hold multiple objects
 		 * of the same type, so that they all get drawn as a group.
 		 */
-		private var wallContainer:Sprite;
+		private var wallImage:BitmapData;
 		
 		public function Main() {
 			if(stage) init();
