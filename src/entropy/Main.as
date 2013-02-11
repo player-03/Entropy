@@ -65,7 +65,7 @@ package entropy {
 			renderer = new BitmapRenderer(new Rectangle(0, 0, STAGE_WIDTH, STAGE_HEIGHT));
 			renderer.addEmitter(emitter);
 			
-			grid = new HexGrid(emitter, 20, 10);
+			grid = new HexGrid(emitter, 25, 15);
 			
 			//add children in the order they should be drawn
 			addChild(renderer);

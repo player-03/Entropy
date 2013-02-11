@@ -11,7 +11,7 @@ package entropy {
 		/**
 		 * The distance from the left vertex to the right vertex of the tile.
 		 */
-		public static const TILE_WIDTH:int = 46;
+		public static const TILE_WIDTH:int = 36;
 		
 		/**
 		 * The difference between x values of each column of tiles. This
@@ -24,7 +24,10 @@ package entropy {
 		 * Equals the difference between y values of tiles directly above
 		 * and below one another.
 		 */
-		public static const TILE_HEIGHT:int = 41;
+		public static const TILE_HEIGHT:int = 31;
+		
+		public static const IMAGE_WIDTH:int = 46;
+		public static const IMAGE_HEIGHT:int = 41;
 		
 		/**
 		 * Represents a space outside the asteroid. Nothing can be placed
@@ -73,10 +76,10 @@ package entropy {
 		private static var emptyBitmapData:BitmapData;
 		
 		private static function checkData(data:BitmapData):void {
-			if(data.width != TILE_WIDTH
-					|| data.height != TILE_HEIGHT) {
-				throw new Error("TILE_WIDTH and TILE_HEIGHT are not up to date!\n"
-							+ "TILE_WIDTH is " + TILE_WIDTH + " and TILE_HEIGHT is " + TILE_HEIGHT
+			if(data.width != IMAGE_WIDTH
+					|| data.height != IMAGE_HEIGHT) {
+				throw new Error("IMAGE_WIDTH and IMAGE_HEIGHT are not up to date!\n"
+							+ "IMAGE_WIDTH is " + IMAGE_WIDTH + " and IMAGE_HEIGHT is " + IMAGE_HEIGHT
 							+ ", but they should be " + data.width + " and " + data.height + ".");
 			}
 		}
