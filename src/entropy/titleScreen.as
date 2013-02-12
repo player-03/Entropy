@@ -4,19 +4,39 @@ package entropy
 	import fl.controls.Button;
 	import fl.controls.Label;
 	import fl.controls.TextInput;
+	import flash.errors.IOError;
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.events.MouseEvent;
+	import flash.net.FileReference;
 
+	//class written with guidance from http://www.adobe.com/devnet/flash/quickstart/filereference_class_as3.html
+	
+	
 	public class titleScreen extends Sprite
 	{
+		
+//---------------------------------------------------------------------------------------------------------
+//public properties
 		public static const tText:String = "AsteroidMiner";
-		public static const lText:String = "load";
-		public static const sText:String = "play";
+		public static const lbText:String = "load";
+		public static const sbText:String = "play";
+		public static const lsText:String = "LOADING";
+//private properties
+		private var m_inString:String;
+		private var m_sButton:Button;
+		private var m_lButton:Button;
+		//private var m_inBox:TextInput;
+		private var m_ref:FileReference;
+		private var m_loadLabel:Label;
+		private var m_titleLabel:Label;
 		
-		private var inString:String;
-		private var sButton:Button;
-		private var lButton:Button;
-		private var inBox:TextInput;
-		
-		public function titleScreen() 
+//--------------------------------------------------------------------------------------------------------------
+	//public functions
+	
+	//constructor
+
+		public function titleScreen(fRef:FileReference) 
 		{
 			super();
 			/*
@@ -60,11 +80,109 @@ package entropy
 				stage.addChild(ControlLayer);
 				stop();
 			*/
-			inString = null
-			sButton = null;
-			lButton = null;
-			inString = "";
+			//m_inBox = new TextInput();
+			m_sButton = new Button();
+			m_sButton.label = sbText;
+			m_lButton = new Button();
+			m_lButton.label = lbText;
+			m_inString = "";
+			//m_inBox.text = m_inString;
+			m_titleLabel = new Label();
+			m_titleLabel.text = tText;
+			
+			//set up in view
+			m_titleLabel.x = 0;
+			m_titleLabel.y = 0;
+			this.addChild(m_titleLabel);
+			m_sButton.x = 0;
+			m_sButton.y = 2 + m_titleLabel.y + m_titleLabel.height;
+			this.addChild(m_sButton);
+			m_lButton.x = 0;
+			m_lButton.y = 2 + m_sButton.y + m_sButton.height;
+			this.addChild(m_lButton);
+			//m_inBox.x = 0;
+			//m_inBox.y = 2 + m_lButton
+			//this.addChild(m_inBox);
+			
+			//set your events
+			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
+			m_sButton.addEventListener(MouseEvent.CLICK, startGame);
+			
 		}
+	
+	//getters and setters
+	
+		public function get inString():String
+		{
+			return this.m_inString;
+		}
+		
+		public function set inString(value:String):void
+		{
+			this.m_inString = value;
+		}
+		
+		public function get reference():FileReference
+		{
+			return this.m_ref;
+		}
+
+		
+//----------------------------------------------------------------------------------------------
+	//private functions
+	
+	//event handlers
+		private function startGame(e:Event):void
+		{
+			
+		}
+		
+		private function selFile(e:Event):void
+		{
+			m_sButton.removeEventListener(MouseEvent.CLICK, startGame);
+			m_lButton.removeEventListener(MouseEvent.CLICK, selFile);
+			//m_inBox.editable = false;
+			
+			m_ref.addEventListener(Event.SELECT, selectedHandler);
+			m_ref.addEventListener(Event.CANCEL, browseCanceledHandler);
+			
+			m_ref.browse();
+		}
+		
+		private function browseCanceledHandler(e:Event):void
+		{
+			m_sButton.addEventListener(MouseEvent.CLICK, startGame);
+			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
+			//m_inBox.editable = true;
+		}
+		
+		private function selectedHandler(e:Event):void
+		{
+			m_ref.removeEventListener(Event.SELECT, selFile);
+			m_ref.removeEventListener(Event.CANCEL, browseCanceledHandler);
+			m_ref.addEventListener(Event.COMPLETE, loadedHandler);
+			m_ref.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+		}
+		
+		private function loadedHandler(e:Event):void
+		{
+			stage.removeChild(this);//now we move on to the thing
+		}
+		
+		private function errorHandler(e:IOErrorEvent):void
+		{
+			trace("error loading file");
+			
+			m_ref.removeEventListener(Event.COMPLETE, loadedHandler);
+			m_ref.removeEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+			
+			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
+			m_sButton.addEventListener(MouseEvent.CLICK, startGame);
+			
+		}
+		
+		
+		
 		
 	}
 
