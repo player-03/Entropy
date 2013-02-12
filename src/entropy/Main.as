@@ -75,5 +75,22 @@ package entropy {
 			addChild(renderer);
 			addChild(grid);
 		}
+		
+		private function initTitle():void
+		{
+			ref = new FileReference();
+			title = new titleScreen(ref);
+			title.addEventListener(Event.REMOVED_FROM_STAGE, f_Loaded);//what to do when title leaves
+			addChild(title);
+		}
+		
+		private function f_Loaded(e:Event):void
+		{
+			trace("loaded success");
+			
+		}
+		
+		
+		
 	}
 }
