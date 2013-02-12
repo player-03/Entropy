@@ -46,7 +46,7 @@ package entropy {
 			counter = blast;
 			
 			var image:Bitmap = new GasParticle() as Bitmap;
-			image.scaleX = image.scaleY = 0.4;
+			image.scaleX = image.scaleY = 0.2;
 			
 			//center the image
 			image.x = -image.width / 2;
@@ -66,8 +66,8 @@ package entropy {
 			//both are 40, so the particles will always start with speed 40
 			addInitializer(new Velocity(new DiscZone(null, 40, 40)));
 			
-			//make the particles collide, with a radius of 4
-			addInitializer(new CollisionRadiusInit(4));
+			//make the particles collide, with a small radius
+			addInitializer(new CollisionRadiusInit(2));
 			
 			//actions update the particles each frame; without these, the
 			//particles wouldn't do anything

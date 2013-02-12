@@ -51,7 +51,6 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="lib\Flint2d_4.0.1.swc" />
-    <element path="lib\fl.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
