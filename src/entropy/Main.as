@@ -105,6 +105,9 @@ package entropy {
 			//add children in the order they should be drawn
 			addChild(renderer);
 			addChild(grid);
+			
+			player = new Player();
+			addChild(player);
 		}
 		
 		private function initTitle():void

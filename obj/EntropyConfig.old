@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'2/7/2013'</value>
+      <value>'2/12/2013'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -37,6 +37,7 @@
     </source-path>
     <library-path append="true">
       <path-element>C:\Users\Phelan\Documents\Entropy\lib\Flint2d_4.0.1.swc</path-element>
+      <path-element>C:\Users\Phelan\Documents\Entropy\lib\fl.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>
