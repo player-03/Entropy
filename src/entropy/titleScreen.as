@@ -10,6 +10,7 @@ package entropy
 	import flash.events.MouseEvent;
 	import flash.net.FileReference;
 	import flash.net.FileFilter;
+	import flash.text.TextField;
 
 	//class written with guidance from http://www.adobe.com/devnet/flash/quickstart/filereference_class_as3.html
 	
@@ -24,13 +25,11 @@ package entropy
 		public static const sbText:String = "play";
 		public static const lsText:String = "LOADING";
 //private properties
-		//private var m_sButton:Button;
-		//private var m_lButton:Button;
 		private var m_sButton:Sprite;
 		private var m_lButton:Sprite;
 		private var m_ref:FileReference;
-		private var m_loadLabel:Label;
-		private var m_titleLabel:Label;
+		private var m_loadLabel:TextField;
+		private var m_titleLabel:TextField;
 		
 //--------------------------------------------------------------------------------------------------------------
 	//public functions
@@ -40,10 +39,6 @@ package entropy
 		public function titleScreen(fRef:FileReference) 
 		{
 			super();
-			//m_sButton = new Button();
-			//m_sButton.label = sbText;
-			//m_lButton = new Button();
-			//m_lButton.label = lbText;
 			
 			//guided by direction to use sprite with button functionality, built with assistance from http://www.blog.mpcreation.pl/making-a-simply-button-in-as3/
 			m_sButton = new Sprite();
@@ -53,16 +48,20 @@ package entropy
 			//set colors
 			//0xFFFF00 = yellow
 			//0x00FFFF = cyan
-			m_sButton.graphics.beginFill(0x00FFFF);
-			m_sButton.graphics.drawRect(0, 0, 100, 50);
-			m_sButton.graphics.endFill();
-			m_lButton.graphics.beginFill(0xFFFF00);
-			m_lButton.graphics.drawRect(0, 0, 100, 50);
-			m_lButton.graphics.endFill();
+			//0x00FF00 = green
+			//0xFF0000 = red
 			
-			m_titleLabel = new Label();
+			
+			
+			m_titleLabel = new TextField();
 			m_titleLabel.text = tText;
-			m_loadLabel = new Label();
+			m_titleLabel.textColor = 0x00FF00
+			//m_titleLabel.htmlText = '<font face="Arial" color="#FF0000" size="14">' + tText + '</font>'; 
+			m_titleLabel.width = 100; 
+			m_titleLabel.height = 22; 
+			
+			
+			m_loadLabel = new TextField();
 			m_loadLabel.text = lsText;
 			m_ref = fRef;
 			//m_ref
@@ -71,11 +70,27 @@ package entropy
 			m_titleLabel.x = 0;
 			m_titleLabel.y = 0;
 			this.addChild(m_titleLabel);
+			var tempL1:TextField = new TextField();
+			tempL1.text = sbText;
+			tempL1.textColor = 0x00FF00;
+			tempL1.height = 50;
+			m_sButton.addChild(tempL1);
 			m_sButton.x = 0;
 			m_sButton.y = 2 + m_titleLabel.y + m_titleLabel.height;
+			m_sButton.graphics.beginFill(0xFF0000);
+			m_sButton.graphics.drawRect(0, 0, 100, 50);
+			m_sButton.graphics.endFill();
 			this.addChild(m_sButton);
+			var tempL2:TextField = new TextField();
+			tempL2.text = lbText;
+			tempL2.textColor = 0x00FF00;
+			tempL2.height = 50;
+			m_lButton.addChild(tempL2);
 			m_lButton.x = 0;
 			m_lButton.y = 2 + m_sButton.y + m_sButton.height;
+			m_lButton.graphics.beginFill(0xFF0000);
+			m_lButton.graphics.drawRect(0, 0, 100, 50);
+			m_lButton.graphics.endFill();
 			this.addChild(m_lButton);
 			
 			//set your events
