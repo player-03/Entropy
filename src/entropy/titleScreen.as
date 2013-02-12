@@ -9,6 +9,7 @@ package entropy
 	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.net.FileReference;
+	import flash.net.FileFilter;
 
 	//class written with guidance from http://www.adobe.com/devnet/flash/quickstart/filereference_class_as3.html
 	
@@ -23,10 +24,10 @@ package entropy
 		public static const sbText:String = "play";
 		public static const lsText:String = "LOADING";
 //private properties
-		private var m_inString:String;
-		private var m_sButton:Button;
-		private var m_lButton:Button;
-		//private var m_inBox:TextInput;
+		//private var m_sButton:Button;
+		//private var m_lButton:Button;
+		private var m_sButton:Sprite;
+		private var m_lButton:Sprite;
 		private var m_ref:FileReference;
 		private var m_loadLabel:Label;
 		private var m_titleLabel:Label;
@@ -39,56 +40,32 @@ package entropy
 		public function titleScreen(fRef:FileReference) 
 		{
 			super();
-			/*
-				var cButton:Button = new Button();
-				var tf1:TextFormat = new TextFormat(); 
-				//tf.color = 0x00FF00; 
-				//tf.font = "Georgia"; 
-				tf1.size = 26;
-				var tf2:TextFormat = new TextFormat();//lol tf2
-				tf2.size = 12;
-				//myCh.setStyle("textFormat", tf); 
-				//myRb.setStyle("textFormat", myCh.getStyle("textFormat"));
-				cButton.width = 200;
-				cButton.height = 80;
-				cButton.x = 20;
-				cButton.y = 50;
-				cButton.setStyle("textFormat", tf1);
-				cButton.label = "start";//remember to switch button style to small.
-				cButton.addEventListener(MouseEvent.CLICK, startMovieWButton);
-				var cButton2:Button = new Button();
-				cButton2.height = 30;
-				cButton2.width = 185;
-				cButton2.x = 35;
-				cButton2.y = 110;
-				cButton2.setStyle("textFormat", tf2);
-				cButton2.label = "forwards?";
-				cButton2.addEventListener(MouseEvent.CLICK, nextColor);
-				var tField1:TextInput = new TextInput();
-				tField1.maxChars=3;//only need up to 3 very max
-				//tField1.multiline = false;
-				//tField1.selectable = true;
-				tField1.text = "1";//start at one
-				tField1.height = 30;
-				tField1.width = 60;
-				tField1.x = 35;
-				tField1.y = 135;
-				ControlLayer.addChild(cButton);//don't add the second yet
-				ControlLayer.addChild(tField1);
-				//finalize by adding layers to stage
-				stage.addChild(SpriteLayer);
-				stage.addChild(ControlLayer);
-				stop();
-			*/
-			//m_inBox = new TextInput();
-			m_sButton = new Button();
-			m_sButton.label = sbText;
-			m_lButton = new Button();
-			m_lButton.label = lbText;
-			m_inString = "";
-			//m_inBox.text = m_inString;
+			//m_sButton = new Button();
+			//m_sButton.label = sbText;
+			//m_lButton = new Button();
+			//m_lButton.label = lbText;
+			
+			//guided by direction to use sprite with button functionality, built with assistance from http://www.blog.mpcreation.pl/making-a-simply-button-in-as3/
+			m_sButton = new Sprite();
+			m_sButton.buttonMode = true;
+			m_lButton = new Sprite();
+			m_lButton.buttonMode = true;
+			//set colors
+			//0xFFFF00 = yellow
+			//0x00FFFF = cyan
+			m_sButton.graphics.beginFill(0x00FFFF);
+			m_sButton.graphics.drawRect(0, 0, 100, 50);
+			m_sButton.graphics.endFill();
+			m_lButton.graphics.beginFill(0xFFFF00);
+			m_lButton.graphics.drawRect(0, 0, 100, 50);
+			m_lButton.graphics.endFill();
+			
 			m_titleLabel = new Label();
 			m_titleLabel.text = tText;
+			m_loadLabel = new Label();
+			m_loadLabel.text = lsText;
+			m_ref = fRef;
+			//m_ref
 			
 			//set up in view
 			m_titleLabel.x = 0;
@@ -100,9 +77,6 @@ package entropy
 			m_lButton.x = 0;
 			m_lButton.y = 2 + m_sButton.y + m_sButton.height;
 			this.addChild(m_lButton);
-			//m_inBox.x = 0;
-			//m_inBox.y = 2 + m_lButton
-			//this.addChild(m_inBox);
 			
 			//set your events
 			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
@@ -111,16 +85,6 @@ package entropy
 		}
 	
 	//getters and setters
-	
-		public function get inString():String
-		{
-			return this.m_inString;
-		}
-		
-		public function set inString(value:String):void
-		{
-			this.m_inString = value;
-		}
 		
 		public function get reference():FileReference
 		{
@@ -146,11 +110,14 @@ package entropy
 			m_ref.addEventListener(Event.SELECT, selectedHandler);
 			m_ref.addEventListener(Event.CANCEL, browseCanceledHandler);
 			
-			m_ref.browse();
+			var fFilter:FileFilter = new FileFilter("Documents", "*.txt");
+			trace("selection start");
+			m_ref.browse([fFilter]);
 		}
 		
 		private function browseCanceledHandler(e:Event):void
 		{
+			trace("browsing cancelled");
 			m_sButton.addEventListener(MouseEvent.CLICK, startGame);
 			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
 			//m_inBox.editable = true;
@@ -158,14 +125,17 @@ package entropy
 		
 		private function selectedHandler(e:Event):void
 		{
+			trace("item selected")
 			m_ref.removeEventListener(Event.SELECT, selFile);
 			m_ref.removeEventListener(Event.CANCEL, browseCanceledHandler);
 			m_ref.addEventListener(Event.COMPLETE, loadedHandler);
 			m_ref.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+			m_ref.load();
 		}
 		
 		private function loadedHandler(e:Event):void
 		{
+			trace("item loaded");
 			stage.removeChild(this);//now we move on to the thing
 		}
 		
