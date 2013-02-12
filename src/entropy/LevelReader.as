@@ -85,7 +85,9 @@ package entropy
 	
 	//random map functions: 
 	
-		public static function randMap(height:int, width:int, asteroidCenterX:int, asteroidCenterY:int, aRadSq:Number, emitter:Emitter):Vector.<Vector.<HexTile>>
+		public static function randMap(height:int, width:int,
+						asteroidCenterX:int, asteroidCenterY:int,
+						aRadSq:Number, gRadSq:Number, grid:HexGrid, emitter:GasEmitter):Vector.<Vector.<HexTile>>
 		{
 			if (height < 0)
 			{
@@ -100,18 +102,18 @@ package entropy
 				return null;
 			}
 			var r:int, c:int;
-			var rVal:Vector.<Vector.<HexTile>> = new Vector.<Vector.<HexTile>>(height)
+			var result:Vector.<Vector.<HexTile>> = new Vector.<Vector.<HexTile>>(height)
 			var row:Vector.<HexTile>;
 			for (r = 0; r < height; r++)
 			{
 				row = new Vector.<HexTile>(width);
-				rVal[r] = row;
+				result[r] = row;
 				for (c = 0; c < width; c++)
 				{
-					row[c] = new HexTile(null, emitter, LevelReader.getTileType(c, r, aRadSq, asteroidCenterX, asteroidCenterY), c, r);
+					row[c] = new HexTile(grid, emitter, LevelReader.getTileType(c, r, aRadSq, gRadSq, asteroidCenterX, asteroidCenterY), c, r);
 				}
 			}
-			return rVal;
+			return result;
 		}
 		
 		
@@ -124,12 +126,23 @@ package entropy
 //-------------------------------------------------------------------------------
 	//private functions
 	
-		private static function getTileType(column:int, row:int, aRadSq:Number, asteroidCenterX:int, asteroidCenterY:int):int
+		private static function getTileType(column:int, row:int,
+					aRadSq:Number, gRadSq:Number,
+					asteroidCenterX:int, asteroidCenterY:int):int
 		{
 			var xDiff:int = HexGrid.columnToX(column) - asteroidCenterX;
 			var yDiff:int = HexGrid.columnRowToY(column, row) - asteroidCenterY;
-			if(Math.random() < 0.95 && xDiff * xDiff + yDiff * yDiff <= aRadSq)
+			if(xDiff * xDiff + yDiff * yDiff <= aRadSq)
 			{
+				if(xDiff * xDiff + yDiff * yDiff <= gRadSq) {
+					if(Math.random() < 0.08) {
+						return HexTile.GAS_DEPOSIT;
+					} else if(Math.random() < 0.04) {
+						return HexTile.VALVE_CLOSED;
+					} else if(Math.random() < 0.04) {
+						return HexTile.TURBINE;
+					}
+				}
 				return HexTile.FILLED;
 			}
 			else
@@ -137,7 +150,6 @@ package entropy
 				return HexTile.SPACE;
 			}
 		}
-	
 		
 	}
 
