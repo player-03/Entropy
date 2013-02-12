@@ -47,7 +47,7 @@ package entropy
 			}
 			else
 			{
-				m_hexes = data;
+				m_hexes = readData(data);
 			}
 			
 			var r:int, c:int;
@@ -89,6 +89,9 @@ package entropy
 			return (row + ((column & 1) == 1 ? 0.5 : 0)) * HexTile.TILE_HEIGHT;
 		}
 		
+		/**
+		 * @return The hexTile at specified row and column
+		 */
 		public function getHex(column:int, row:int):HexTile
 		{
 			if(column < 0 || column >= m_width || row < 0 || row >= m_height)
@@ -98,6 +101,9 @@ package entropy
 			return m_hexes[row][column];
 		}
 		
+		/**
+		 * @return the hexTile that exists at the row and column corresponding to local x y coordinates
+		 */
 		public function getHexAtCoordinates(x:Number, y:Number):HexTile {
 			//huge hack
 			x += HexTile.TILE_X_OFFSET;
@@ -144,6 +150,7 @@ package entropy
 			return getHex(int(column), int(row));
 		}
 		
+		
 		public function getHexAbove(column:int, row:int):HexTile
 		{
 			return this.getHex(column, row - 1);
@@ -184,5 +191,18 @@ package entropy
 			}
 			return this.getHex(column + 1, row);
 		}
+		
+		
+		/**
+		 * 
+		 * @param	data, hextiles obtained from a file
+		 * @return the data formatted to the width and height of this hexgrid
+		 */
+		private function readData(data:Vector.<Vector.<HexTile>>):Vector.<Vector.<HexTile>>
+		{
+			return new Vector.<Vector.<HexTile>>();
+			
+		}
+		
 	}
 }

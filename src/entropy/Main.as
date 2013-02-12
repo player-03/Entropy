@@ -23,6 +23,15 @@ package entropy {
 		public static const STAGE_HEIGHT:int = 480;
 		
 		/**
+		 * Defines whether loading a level or generating a random one
+		 */
+		public static const LOAD_LEVEL:uint = 0;
+		/**
+		 * Defines whether loading a level or generating a random one
+		 */
+		public static const RAND_LEVEL:uint = 1;
+		
+		/**
 		 * The renderer manages and renders the particle system.
 		 */
 		private var renderer:BitmapRenderer;
@@ -39,8 +48,6 @@ package entropy {
 		 * of the same type, so that they all get drawn as a group.
 		 */
 		private var grid:HexGrid;
-		private var ref:FileReference;
-		private var refS:String;
 		private var reader:LevelReader;
 		private var title:titleScreen;
 		
@@ -59,7 +66,8 @@ package entropy {
 		}
 	
 		
-		private function initMap():void {
+		private function initMap(type:uint):void {
+			
 			//draw a black rectangle behind the stage
 			graphics.beginFill(0x000000);
 			graphics.drawRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
@@ -69,7 +77,19 @@ package entropy {
 			renderer = new BitmapRenderer(new Rectangle(0, 0, STAGE_WIDTH, STAGE_HEIGHT));
 			renderer.addEmitter(emitter);
 			
-			grid = new HexGrid(emitter, 25, 15);
+			//now we determine what to do if load
+			if(type == LOAD_LEVEL)
+			{
+				var loadedData:Vector.<Vector.<HexTile>> = null;
+				reader = new LevelReader(title.reference);
+				loadedData = reader.fileToVector();
+				
+				grid = new HexGrid(emitter, 25, 15, -1, loadedData);
+			}
+			else
+			{
+				grid = new HexGrid(emitter, 25, 15);
+			}
 			
 			//add children in the order they should be drawn
 			addChild(renderer);
@@ -81,27 +101,23 @@ package entropy {
 			graphics.beginFill(0x000000);
 			graphics.drawRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 			graphics.endFill();
-			
-			ref = new FileReference();
-			title = new titleScreen(ref);
+			title = new titleScreen(new FileReference());
 			//title.addEventListener(Event.REMOVED_FROM_STAGE, f_Loaded);//what to do when title leaves
 			stage.addEventListener(Event.COMPLETE, f_Loaded);
-			stage.addEventListener(Event.CANCEL, f_random);
+			stage.addEventListener(Event.CANCEL, f_random);//risky
 			addChild(title);
 		}
 		
 		private function f_Loaded(e:Event):void
 		{
 			removeChild(title);
-			//trace("loaded success");
-			initMap();
+			initMap(LOAD_LEVEL);
 		}
 		
 		private function f_random(e:Event):void
 		{
 			removeChild(title);
-			//trace("no load, go random");
-			initMap();
+			initMap(RAND_LEVEL);
 		}
 		
 		

@@ -51,8 +51,6 @@ package entropy
 			//0x00FF00 = green
 			//0xFF0000 = red
 			
-			
-			
 			m_titleLabel = new TextField();
 			m_titleLabel.text = tText;
 			m_titleLabel.textColor = 0x00FF00
