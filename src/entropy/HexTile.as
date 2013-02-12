@@ -1,6 +1,7 @@
 package entropy {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.events.Event;
 	import org.flintparticles.common.emitters.Emitter;
 	import org.flintparticles.twoD.actions.CollisionZone;
 	
@@ -20,14 +21,16 @@ package entropy {
 		public static const TILE_X_OFFSET:Number = TILE_WIDTH * 0.75;
 		
 		/**
+		 * The amount by which the tiles overlap.
+		 */
+		public static const TILE_X_OVERLAP:Number = TILE_WIDTH * 0.25;
+		
+		/**
 		 * The distance from the top edge to the bottom edge of the tile.
 		 * Equals the difference between y values of tiles directly above
 		 * and below one another.
 		 */
 		public static const TILE_HEIGHT:int = 31;
-		
-		public static const IMAGE_WIDTH:int = 46;
-		public static const IMAGE_HEIGHT:int = 41;
 		
 		/**
 		 * Represents a space outside the asteroid. Nothing can be placed
@@ -73,25 +76,34 @@ package entropy {
 		[Embed(source="../../lib/img/Wall.png")]
 		private static var Filled:Class;
 		private static var filledBitmapData:BitmapData;
-		private static var emptyBitmapData:BitmapData;
 		
-		private static function checkData(data:BitmapData):void {
-			if(data.width != IMAGE_WIDTH
-					|| data.height != IMAGE_HEIGHT) {
-				throw new Error("IMAGE_WIDTH and IMAGE_HEIGHT are not up to date!\n"
-							+ "IMAGE_WIDTH is " + IMAGE_WIDTH + " and IMAGE_HEIGHT is " + IMAGE_HEIGHT
-							+ ", but they should be " + data.width + " and " + data.height + ".");
-			}
-		}
+		[Embed(source="../../lib/img/ValveClosed.png")]
+		private static var ValveClosed:Class;
+		private static var valveClosedBitmapData:BitmapData;
+		
+		[Embed(source="../../lib/img/Turbine.png")]
+		private static var Turbine:Class;
+		private static var turbineBitmapData:BitmapData;
+		
+		private static var emptyBitmapData:BitmapData;
 		
 		private static function getBitmapData(type:uint):BitmapData {
 			switch(type) {
 				case FILLED:
 					if(filledBitmapData == null) {
 						filledBitmapData = ((Bitmap) (new Filled())).bitmapData;
-						checkData(filledBitmapData);
 					}
 					return filledBitmapData;
+				case VALVE_CLOSED:
+					if(valveClosedBitmapData == null) {
+						valveClosedBitmapData = ((Bitmap) (new ValveClosed())).bitmapData;
+					}
+					return valveClosedBitmapData;
+				case TURBINE:
+					if(turbineBitmapData == null) {
+						turbineBitmapData = ((Bitmap) (new Turbine())).bitmapData;
+					}
+					return turbineBitmapData;
 				case SPACE:
 				default:
 					return null;
@@ -104,7 +116,8 @@ package entropy {
 		
 		///////////////////////////////////////////////////////////////////////////
 		
-		private var m_grid:HexGrid;
+		private var mGrid:HexGrid;
+		private var mEmitter:GasEmitter;
 		
 		private var mColumn:int;
 		private var mRow:int;
@@ -112,40 +125,60 @@ package entropy {
 		private var mType:uint;
 		private var collisionZone:HexagonZone;
 		
-		public function HexTile(gridItem:HexGrid, emitter:Emitter, type:uint,
+		public function HexTile(grid:HexGrid, emitter:GasEmitter, type:uint,
 								column:int, row:int) {
 			super(getBitmapData(type));
-			visible = bitmapData != null;
 			
-			this.m_grid = gridItem;
-			
+			mGrid = grid;
+			mEmitter = emitter;
 			mColumn = column;
 			mRow = row;
-			/*
-			if (grid === null)
-			{
-				x = HexGrid.columnToX(column);
-				y = HexGrid.columnRowToY(column, row);
-			}
-			else
-			{
-				x = grid.columnToX(column);
-				y = grid.columnRowToY(column, row);
-			}
-			*/
-			x = HexGrid.columnToX(column);
-			y = HexGrid.columnRowToY(column, row);
+			
+			onUpdateBitmapData();
 			
 			mType = type;
 			
 			//collision data may be necessary for any tile type except
 			//space, so create the zone now
 			if(mType != SPACE) {
-				collisionZone = new HexagonZone(x + TILE_WIDTH / 2,
-												y + TILE_HEIGHT / 2,
+				collisionZone = new HexagonZone(HexGrid.columnToX(column),
+												HexGrid.columnRowToY(column, row),
 												TILE_WIDTH / 2 - 2);
 				collisionZone.collisionEnabled = typeCollides(mType);
 				emitter.addAction(new CollisionZone(collisionZone));
+			}
+			
+			addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+		
+		private function init(e:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE, init);
+			
+			//gas deposits need to listen for nearby changes
+			if(mType == GAS_DEPOSIT) {
+				registerChangeListener(mGrid.getHexAbove(column, row));
+				registerChangeListener(mGrid.getHexAboveLeft(column, row));
+				registerChangeListener(mGrid.getHexBelowLeft(column, row));
+				registerChangeListener(mGrid.getHexBelow(column, row));
+				registerChangeListener(mGrid.getHexBelowRight(column, row));
+				registerChangeListener(mGrid.getHexAboveRight(column, row));
+			}
+		}
+		
+		private function registerChangeListener(h:HexTile):void {
+			if(h != null) {
+				h.addEventListener(Event.CHANGE, onNearbyChange);
+			}
+		}
+		
+		private function onNearbyChange(e:Event):void {
+			var target:HexTile = e.target as HexTile;
+			
+			if(mType != GAS_DEPOSIT) {
+				target.removeEventListener(Event.CHANGE, onNearbyChange);
+			} else if(!typeCollides(target.mType)) {
+				target.removeEventListener(Event.CHANGE, onNearbyChange);
+				type = EXCAVATED;
 			}
 		}
 		
@@ -160,30 +193,38 @@ package entropy {
 			return mType;
 		}
 		
-		public function get grid():HexGrid
-		{
-			return this.m_grid;
-		}
-		
 		public function set type(value:uint):void {
 			//you cannot change space tiles
 			if(mType == SPACE) {
 				return;
 			}
 			
+			//you cannot add gas pockets after starting the level
+			if(value == GAS_DEPOSIT) {
+				return;
+			}
+			
+			//if this is a gas pocket, spawn the particles
+			if(mType == GAS_DEPOSIT) {
+				mEmitter.emitFrom(80, collisionZone);
+			}
+			
 			mType = value;
 			bitmapData = getBitmapData(mType);
-			visible = bitmapData != null;
+			onUpdateBitmapData();
 			
-			if(collisionZone != null) {
-				collisionZone.collisionEnabled = typeCollides(mType);
-			}
+			collisionZone.collisionEnabled = typeCollides(mType);
+			
+			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
-		public function set grid(value:HexGrid):void//try to set the grid of the item
-		{
-			this.m_grid = value;
-			//return true;
+		private function onUpdateBitmapData():void {
+			visible = bitmapData != null;
+			
+			if(visible) {
+				x = HexGrid.columnToX(column) - bitmapData.width / 2;
+				y = HexGrid.columnRowToY(column, row) - bitmapData.height / 2;
+			}
 		}
 		
 		public function getCollisionZone():HexagonZone {

@@ -3,6 +3,7 @@ package entropy
 	import entropy.HexTile;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.MouseEvent;
 	import flash.utils.ByteArray;
 	import org.flintparticles.common.emitters.Emitter;
 	import entropy.LevelReader;
@@ -17,7 +18,7 @@ package entropy
 		private var m_width:int;
 		private var m_height:int;
 		
-		public function HexGrid(emitter:Emitter, width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<HexTile>> = null)
+		public function HexGrid(emitter:GasEmitter, width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<HexTile>> = null)
 		{
 			super();
 			
@@ -37,13 +38,16 @@ package entropy
 			}
 			m_asteroidRadiusSquared = asteroidRadius * asteroidRadius;
 			
+			var gasRadiusSquared:Number = (asteroidRadius - HexTile.TILE_WIDTH) * (asteroidRadius - HexTile.TILE_WIDTH);
+			
 			if (data === null || data.length < 1 || data[0].length < 1)
 			{
-				m_hexes = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY, m_asteroidRadiusSquared, emitter);
+				m_hexes = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY,
+					m_asteroidRadiusSquared, gasRadiusSquared, this, emitter);
 			}
 			else
 			{
-				m_hexes = data;
+				m_hexes = readData(data);
 			}
 			
 			var r:int, c:int;
@@ -51,26 +55,21 @@ package entropy
 			{
 				for (c = 0; c < width; c++)
 				{
-					(this.m_hexes[r][c]).grid = this;//set the grid property of the hexagons
 					this.addChild(this.m_hexes[r][c]);
 				}
 			}
+			
+			addEventListener(MouseEvent.CLICK, onClick);
 		}
-		/*
-		private function getTileType(column:int, row:int):int
-		{
-			var xDiff:int = columnToX(column) - m_asteroidCenterX;
-			var yDiff:int = columnRowToY(column, row) - m_asteroidCenterY;
-			if(Math.random() < 0.95 && xDiff * xDiff + yDiff * yDiff <= m_asteroidRadiusSquared)
-			{
-				return HexTile.FILLED;
-			}
-			else
-			{
-				return HexTile.SPACE;
+		
+		private function onClick(e:MouseEvent):void {
+			var clickedHex:HexTile = getHexAtCoordinates(mouseX, mouseY);
+			
+			if(clickedHex != null) {
+				//temporary code:
+				clickedHex.type = HexTile.EXCAVATED;
 			}
 		}
-		*/
 		
 		/**
 		 * @return The x coordinate of a tile in the given column.
@@ -90,6 +89,9 @@ package entropy
 			return (row + ((column & 1) == 1 ? 0.5 : 0)) * HexTile.TILE_HEIGHT;
 		}
 		
+		/**
+		 * @return The hexTile at specified row and column
+		 */
 		public function getHex(column:int, row:int):HexTile
 		{
 			if(column < 0 || column >= m_width || row < 0 || row >= m_height)
@@ -99,15 +101,55 @@ package entropy
 			return m_hexes[row][column];
 		}
 		
-		public static function getHex(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			if (vect.length < 1 || vect[0].length < 1 || column < 0 || column >= vect.length || row < 0 || row > vect[0].length)
-			{
+		/**
+		 * @return the hexTile that exists at the row and column corresponding to local x y coordinates
+		 */
+		public function getHexAtCoordinates(x:Number, y:Number):HexTile {
+			//huge hack
+			x += HexTile.TILE_X_OFFSET;
+			y += HexTile.TILE_HEIGHT / 2;
+			
+			//the int() function behaves differently for negative values,
+			//so deal with those preemptively
+			if(x < 0 || y < 0) {
 				return null;
 			}
-			return vect[row][column];
 			
+			//kinda weird names; these correspond to the column and row,
+			//PLUS fractions of one column/row
+			var column:Number = x / HexTile.TILE_X_OFFSET;
+			var row:Number = y / HexTile.TILE_HEIGHT - (int(column) & 1 == 1 ? 0.5 : 0);
+			
+			//also isolate the fractions
+			var columnFraction:Number = column - int(column);
+			var rowFraction:Number = row - int(row);
+			
+			//if the point falls in the overlapping zone
+			if(columnFraction < HexTile.TILE_X_OVERLAP) {
+				//if the point is above the halfway point
+				if(rowFraction < 0.5) {
+					//the dividing line stretches between the local points
+					//(TILE_X_OVERLAP, 0) and (0, 0.5)
+					if(rowFraction / HexTile.TILE_X_OVERLAP
+							+ columnFraction / 0.5 < 1) {
+						return getHexAboveLeft(int(column), int(row));
+					}
+				}
+				
+				//if the point is below the halfway point
+				else {
+					//the dividing line stretches between the local points
+					//(0, 0.5) and (TILE_X_OVERLAP, 1)
+					if((1 - rowFraction) / HexTile.TILE_X_OVERLAP
+							+ columnFraction / 0.5 < 1) {
+						return getHexBelowLeft(int(column), int(row));
+					}
+				}
+			}
+			
+			return getHex(int(column), int(row));
 		}
+		
 		
 		public function getHexAbove(column:int, row:int):HexTile
 		{
@@ -149,49 +191,18 @@ package entropy
 			}
 			return this.getHex(column + 1, row);
 		}
-		//-------------------------------------------------
-		//now the static versions of above
-		public static function getHexAbove(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			return HexGrid.getHex(vect, column, row - 1);
-		}
-		public static function getHexAboveLeft(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			if((column & 1) == 1)
-			{
-				return HexGrid.getHex(vect, column + 1, row);
-			}
-			return HexGrid.getHex(vect, column + 1, row - 1);
-		}
-		public static function getHexAboveRight(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			if((column & 1) == 1)
-			{
-				return HexGrid.getHex(vect, column + 1, row);
-			}
-			return HexGrid.getHex(vect, column + 1, row - 1);
-		}
-		public static function getHexBelow(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			return HexGrid.getHex(vect, column, row + 1);
-		}
-		public static function getHexBelowLeft(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			if((column & 1) == 1)
-			{
-				return HexGrid.getHex(vect, column - 1, row + 1);
-			}
-			return HexGrid.getHex(vect, column - 1, row);
-		}
-		public static function getHexBelowRight(vect:Vector.<Vector.<HexTile>>, column:int, row:int):HexTile
-		{
-			if((column & 1) == 1)
-			{
-				return HexGrid.getHex(vect, column + 1, row + 1);
-			}
-			return HexGrid.getHex(vect, column + 1, row);
-		}
 		
+		
+		/**
+		 * 
+		 * @param	data, hextiles obtained from a file
+		 * @return the data formatted to the width and height of this hexgrid
+		 */
+		private function readData(data:Vector.<Vector.<HexTile>>):Vector.<Vector.<HexTile>>
+		{
+			return new Vector.<Vector.<HexTile>>();
+			
+		}
 		
 	}
 }

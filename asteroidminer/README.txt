@@ -32,7 +32,7 @@ HOW TO BUILD A LEVEL:
 
 the level format is as follows.  each level is made up of a header and a footer.  The header describes the size of the map, how many asteroids there are and their positions, how many robots there are and their positions, how many launchpads there are and their positions, the player's goals and starting resources.  the footer describes what is in each hexagon.  in the default format, hexagons are read first left to right and then top to bottom, and staggered so every second hexagon that does not transfer to a newline is positioned to the right and below the hexagon preceding it (the hexagon following is positioned to the right and above this lower hexagon).
 
-the general syntax of delimiting between items in the text file is :-: denotes separation at the top level, :*: denotes separation at the next level (preceded by a statement stating what objects are being described), , and . denotes separation of parts of the same object.  &&& denotes the separation between header and footer information
+the general syntax of delimiting between items in the text file is :-: denotes separation at the top level, :*: denotes separation at the next level (preceded by a statement stating what objects are being described), :^: is the third level of nesting, and . denotes separation of parts of the same object.  &&& denotes the separation between header and footer information
 
 DISCLAIMER: at this time we only have support for single robots and single launchpads and single asteroids
 
@@ -54,6 +54,6 @@ turbine (default origentation downright)=t.6
 the following is an example of a level
 the items within double quotations are not to be in double quotations when writing a level, but they stand for what should go in their place.
 
-HEADER:-:SIZE:*:"map width in hexagons"."map height in hexagons":-:ROBOT:*:"robot1xlocation"."robot1ylocation":*:"robot2xlocation"."robot2ylocation":-:ASTEROID:*:"asteroid1xcenter"."asteroid1ycenter":*:"asteroid2xcenter"."asteroid2ycenter":-:GOAL:*:GAS:^::*:ENERGY:^::-:&&&FOOTER:-:DATA:*::-:END
+HEADER:-:SIZE:*:"mapwidthinhexagons"."mapheightinhexagons":-:ROBOT:*:"robot1xlocation"."robot1ylocation":*:"robot2xlocation"."robot2ylocation":-:ASTEROID:*:"asteroid1xcenter"."asteroid1ycenter":*:"asteroid2xcenter"."asteroid2ycenter":-:MAX:*:GAS:^:"maximumgasasinteger":*:ENERGY:^:"maximumenergyasinteger:-:GOAL:*:GAS:^:"thegasgoalasinteger":*:ENERGY:^:"theenergygoalasinteger:-:STARTR:*:GAS:^:"startinggasasinteger":*:ENERGY:^:"startingenergyasinteger":-:&&&FOOTER:-:DATA:*:"row1column1tiletypeasinteger":*:"row1column2tiletypeasinteger":*:"row1column3tiletypeasinteger":*:"etc":*:"row2column1tiletypeasinteger":*:"row2column2tyletypeasinteger":*:"etc":-:END
 
 
