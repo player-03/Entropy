@@ -98,7 +98,7 @@ package entropy
 	//event handlers
 		private function startGame(e:Event):void
 		{
-			
+			stage.dispatchEvent(new Event(Event.CANCEL, true, true));
 		}
 		
 		private function selFile(e:Event):void
@@ -111,13 +111,13 @@ package entropy
 			m_ref.addEventListener(Event.CANCEL, browseCanceledHandler);
 			
 			var fFilter:FileFilter = new FileFilter("Documents", "*.txt");
-			trace("selection start");
+			//trace("selection start");
 			m_ref.browse([fFilter]);
 		}
 		
 		private function browseCanceledHandler(e:Event):void
 		{
-			trace("browsing cancelled");
+			//trace("browsing cancelled");
 			m_sButton.addEventListener(MouseEvent.CLICK, startGame);
 			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
 			//m_inBox.editable = true;
@@ -125,18 +125,18 @@ package entropy
 		
 		private function selectedHandler(e:Event):void
 		{
-			trace("item selected")
+			//trace("item selected")
 			m_ref.removeEventListener(Event.SELECT, selFile);
 			m_ref.removeEventListener(Event.CANCEL, browseCanceledHandler);
 			m_ref.addEventListener(Event.COMPLETE, loadedHandler);
 			m_ref.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
 			m_ref.load();
 		}
-		
 		private function loadedHandler(e:Event):void
 		{
-			trace("item loaded");
-			stage.removeChild(this);//now we move on to the thing
+			//trace("item loaded");
+			//stage.removeChild(this);//now we move on to the thing
+			stage.dispatchEvent(new Event(Event.COMPLETE, true, true));//must add event listener to stage first
 		}
 		
 		private function errorHandler(e:IOErrorEvent):void
@@ -148,7 +148,6 @@ package entropy
 			
 			m_lButton.addEventListener(MouseEvent.CLICK, selFile);
 			m_sButton.addEventListener(MouseEvent.CLICK, startGame);
-			
 		}
 		
 		

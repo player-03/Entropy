@@ -84,13 +84,23 @@ package entropy {
 			
 			ref = new FileReference();
 			title = new titleScreen(ref);
-			title.addEventListener(Event.REMOVED_FROM_STAGE, f_Loaded);//what to do when title leaves
+			//title.addEventListener(Event.REMOVED_FROM_STAGE, f_Loaded);//what to do when title leaves
+			stage.addEventListener(Event.COMPLETE, f_Loaded);
+			stage.addEventListener(Event.CANCEL, f_random);
 			addChild(title);
 		}
 		
 		private function f_Loaded(e:Event):void
 		{
-			trace("loaded success");
+			removeChild(title);
+			//trace("loaded success");
+			initMap();
+		}
+		
+		private function f_random(e:Event):void
+		{
+			removeChild(title);
+			//trace("no load, go random");
 			initMap();
 		}
 		
