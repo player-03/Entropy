@@ -83,6 +83,10 @@ package entropy
 		 */
 		public static function readMapFS(fVal:String):Vector.<Vector.<HexTile>>
 		{
+			trace("valid string found");
+			trace("string is");
+			trace(fVal);
+			
 			var placeHolder:Vector.<String> = new Vector.<String>();
 			placeHolder.push(fVal);
 			return readMapFSV(placeHolder);
@@ -100,24 +104,56 @@ package entropy
 		 */
 		public static function readfileFF(fVal:FileReference):Vector.<Vector.<HexTile>>
 		{
-			trace("data is");
-			trace(fVal.data);
-			
+			trace("reading file");
 			var placeHolder:String = String(fVal.data);
 			if (placeHolder.length < 1)
+			{
+				trace("placeholder is empty");
 				return null;
+			}
 			var indexer:uint = 0;
 			while (placeHolder.charAt(indexer) != HF_DELIM.charAt(0) && indexer < uint.MAX_VALUE-(HF_DELIM.length+1) && indexer < placeHolder.length - (HF_DELIM.length+1))
 				indexer++;
-		if (indexer == uint.MAX_VALUE-(HF_DELIM.length+1) || indexer == placeHolder.length-(HF_DELIM.length+1) || placeHolder.substring(indexer, indexer + HF_DELIM.length) != HF_DELIM)
+			if (indexer == uint.MAX_VALUE-(HF_DELIM.length+1) || indexer == placeHolder.length-(HF_DELIM.length+1) || placeHolder.substring(indexer, indexer + HF_DELIM.length) != HF_DELIM)
+			{
+				trace("footer delim not found");
 				return null;
+			}
 			indexer += HF_DELIM.length;
 			if (placeHolder.substring(indexer, indexer + LEVEL_FOOTER_CODE.length) != LEVEL_FOOTER_CODE)
+			{
+				trace("footer not found");
 				return null;
-			var indexer2:uint = indexer + LEVEL_FOOTER_CODE.length;
+			}
+			indexer += LEVEL_FOOTER_CODE.length;
+			var indexer2:uint = FOOTER_DATA_CODE.length;
+			var indexerDELIM:uint = NEST1_DELIM.length;
+			if( indexerDELIM*2+indexer+indexer > placeHolder.length+1 || placeHolder.substring(indexer, indexer+indexerDELIM) != NEST1_DELIM || placeHolder.substring(indexer+indexerDELIM, indexer+indexerDELIM+indexer2) != FOOTER_DATA_CODE || placeHolder.substring(indexer+indexer2+indexerDELIM, indexer+indexer2+indexerDELIM*2) != NEST1_DELIM)
+			{
+				trace("data not found");
+				return null;
+			}
+			indexer += indexerDELIM * 2 + indexer2;//here is all the items
+			var startIndex:uint = indexer;
+			var endIndex:uint = startIndex;
+			indexer2 = indexer + NEST1_DELIM.length;
+			while (indexer2 < placeHolder.length + 1 && placeHolder.substring(indexer, indexer+indexer2) != NEST1_DELIM)
+			{
+				indexer++;
+				indexer2++;
+			}
+			if ( indexer+indexer2+LEVEL_END_CODE.length > placeHolder.length || placeHolder.substring(indexer, indexer + indexer2) != NEST1_DELIM || placeHolder.substring(indexer+indexer2, indexer+indexer2+LEVEL_END_CODE.length) != LEVEL_END_CODE)
+			{
+				trace("file end not found");
+				return null;
+			}
+			else
+				endIndex = indexer;
 			
-			
-			return readMapFS("");
+			if ( endIndex > startIndex+1)
+				return readMapFS(placeHolder.substring(startIndex, endIndex));
+			else
+				return null;
 		}
 		
 		
