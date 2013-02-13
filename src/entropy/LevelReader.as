@@ -81,19 +81,20 @@ package entropy
 		 * @param	fVal the string representing the footer of the read file, the map in text format
 		 * @return	the map from the file
 		 */
-		public static function readMapFS(fVal:String):Vector.<Vector.<HexTile>>
+		public static function readMapFS(fVal:String, width:int = -1, height:int = -1 ):Vector.<Vector.<HexTile>>
 		{
-			trace("valid string found");
-			trace("string is");
-			trace(fVal);
+			//trace("valid string found");
+			//trace(fVal);
 			
 			var placeHolder:Vector.<String> = new Vector.<String>();
-			placeHolder.push(fVal);
+			placeHolder = new Vector.<String>(fVal.split(NEST2_DELIM));
 			return readMapFSV(placeHolder);
 		}
 		
 		public static function readMapFSV(fVal:Vector.<String>):Vector.<Vector.<HexTile>>
 		{
+			
+			
 			return null;
 		}
 		
@@ -102,7 +103,7 @@ package entropy
 		 * @param	fVal the file reference whose data will be read
 		 * @return the map from the file
 		 */
-		public static function readfileFF(fVal:FileReference):Vector.<Vector.<HexTile>>
+		public static function readfileFF(fVal:FileReference, width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
 		{
 			trace("reading file");
 			var placeHolder:String = String(fVal.data);
@@ -128,19 +129,21 @@ package entropy
 			indexer += LEVEL_FOOTER_CODE.length;
 			var indexer2:uint = FOOTER_DATA_CODE.length;
 			var indexerDELIM:uint = NEST1_DELIM.length;
-			if( indexerDELIM*2+indexer+indexer > placeHolder.length+1 || placeHolder.substring(indexer, indexer+indexerDELIM) != NEST1_DELIM || placeHolder.substring(indexer+indexerDELIM, indexer+indexerDELIM+indexer2) != FOOTER_DATA_CODE || placeHolder.substring(indexer+indexer2+indexerDELIM, indexer+indexer2+indexerDELIM*2) != NEST1_DELIM)
+			if( indexerDELIM*2+indexer+indexer2 > placeHolder.length+1 || placeHolder.substring(indexer, indexer+indexerDELIM) != NEST1_DELIM || placeHolder.substring(indexer+indexerDELIM, indexer+indexerDELIM+indexer2) != FOOTER_DATA_CODE || placeHolder.substring(indexer+indexer2+indexerDELIM, indexer+indexer2+indexerDELIM*2) != NEST2_DELIM)
 			{
-				trace("data not found");
+				trace("data check error");
 				return null;
 			}
-			indexer += indexerDELIM * 2 + indexer2;//here is all the items
+			var tempInd:uint = indexer;
+			indexer = indexer + indexerDELIM + indexerDELIM + indexer2;//here is all the items
+			//move to the next index so we don't catch an exit condition for the while loop
+			//that adds 10 to indexer, now at 475 was 465
 			var startIndex:uint = indexer;
 			var endIndex:uint = startIndex;
-			indexer2 = indexer + NEST1_DELIM.length;
-			while (indexer2 < placeHolder.length + 1 && placeHolder.substring(indexer, indexer+indexer2) != NEST1_DELIM)
+			indexer2 = NEST1_DELIM.length;
+			while (indexer+indexer2 < placeHolder.length + 1 && placeHolder.substring(indexer, indexer+indexer2) != NEST1_DELIM)
 			{
 				indexer++;
-				indexer2++;
 			}
 			if ( indexer+indexer2+LEVEL_END_CODE.length > placeHolder.length || placeHolder.substring(indexer, indexer + indexer2) != NEST1_DELIM || placeHolder.substring(indexer+indexer2, indexer+indexer2+LEVEL_END_CODE.length) != LEVEL_END_CODE)
 			{
@@ -150,10 +153,14 @@ package entropy
 			else
 				endIndex = indexer;
 			
-			if ( endIndex > startIndex+1)
-				return readMapFS(placeHolder.substring(startIndex, endIndex));
-			else
+			if ( !(endIndex > startIndex + 1))
+			{
 				return null;
+			}
+			else
+			{
+				return readMapFS(placeHolder.substring(startIndex, endIndex));	
+			}
 		}
 		
 		
@@ -194,11 +201,11 @@ package entropy
 		/**
 		 * @return A 2-dimensional vector representing the map to be used from the member file reference
 		 */
-		public function fileToVector():Vector.<Vector.<HexTile>>
+		public function fileToVector(width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
 		{
 			if (this.m_file != null && this.m_file.data != null)
 			{
-				return LevelReader.readfileFF(this.m_file);
+				return LevelReader.readfileFF(this.m_file, width, height);
 			}
 			else
 			{

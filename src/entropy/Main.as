@@ -4,6 +4,8 @@ package entropy {
 	import flash.geom.Rectangle;
 	import flash.net.FileReference;
 	import org.flintparticles.twoD.renderers.BitmapRenderer;
+	import flash.geom.Point;
+	import flash.display.BitmapData;
 	
 	
 	//this project leverages the flint particle system, which can be found at http://flintparticles.org/
@@ -93,9 +95,9 @@ package entropy {
 			{
 				var loadedData:Vector.<Vector.<HexTile>> = null;
 				reader = new LevelReader(title.reference);
-				loadedData = reader.fileToVector();
+				loadedData = reader.fileToVector(10, 5);
 				
-				grid = new HexGrid(emitter, 25, 15, -1, loadedData);
+				grid = new HexGrid(emitter, 10, 5, -1, loadedData);
 			}
 			else
 			{
