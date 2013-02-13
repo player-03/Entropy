@@ -70,10 +70,10 @@ package entropy
 		
 		private function init(e:Event):void {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
-			stage.addEventListener(MouseEvent.CLICK, onClick);
+			//stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
-		private function onClick(e:MouseEvent):void {
+		/*private function onClick(e:MouseEvent):void {
 			var clickedHex:HexTile = getHexAtCoordinates(mouseX, mouseY);
 			
 			if(clickedHex != null) {
@@ -100,7 +100,7 @@ package entropy
 					default:
 				}
 			}
-		}
+		}*/
 		
 		/**
 		 * @return The x coordinate of a tile in the given column.

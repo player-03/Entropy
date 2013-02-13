@@ -1,4 +1,5 @@
 package entropy {
+	import flash.display.Bitmap;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.Rectangle;
@@ -106,12 +107,12 @@ package entropy {
 				grid = new HexGrid(emitter, gauge, 25, 15);
 			}
 			
+			player = new Player(grid, gauge);
+			
 			//add children in the order they should be drawn
 			addChild(renderer);
 			addChild(grid);
 			addChild(gauge);
-			
-			player = new Player();
 			addChild(player);
 		}
 		
