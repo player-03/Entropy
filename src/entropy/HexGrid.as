@@ -3,6 +3,7 @@ package entropy
 	import entropy.HexTile;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.utils.ByteArray;
 	import org.flintparticles.common.emitters.Emitter;
@@ -18,7 +19,10 @@ package entropy
 		private var m_width:int;
 		private var m_height:int;
 		
-		public function HexGrid(emitter:GasEmitter, width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<HexTile>> = null)
+		public var energyGauge:EnergyGauge;
+		
+		public function HexGrid(emitter:GasEmitter, energyGauge:EnergyGauge,
+						width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<uint>> = null)
 		{
 			super();
 			
@@ -33,6 +37,8 @@ package entropy
 			m_asteroidCenterY = columnRowToY(m_asteroidCenterX, m_height >> 1);
 			m_asteroidCenterX = columnToX(m_asteroidCenterX);
 			
+			this.energyGauge = energyGauge;
+			
 			if(asteroidRadius < 1) {
 				asteroidRadius = Math.min(m_asteroidCenterX, m_asteroidCenterY);
 			}
@@ -40,37 +46,59 @@ package entropy
 			
 			var gasRadiusSquared:Number = (asteroidRadius - HexTile.TILE_WIDTH) * (asteroidRadius - HexTile.TILE_WIDTH);
 			
-			if (data === null || data.length < 1 || data[0].length < 1)
-			{
-				m_hexes = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY,
-					m_asteroidRadiusSquared, gasRadiusSquared, this, emitter);
-			}
-			else
-			{
-				m_hexes = data;//readData(data);
-				this.attachHexes(emitter);
-			}
 			
-			
+			if (data === null || data.length < 1 || data[0].length < 1) {
+				data = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY,
+					m_asteroidRadiusSquared, gasRadiusSquared);
+			} else {
+				m_height = data.length;
+				m_width = data[0].length;
+			}
 			
 			var r:int, c:int;
-			for (r = 0; r < height; r++)
-			{
-				for (c = 0; c < width; c++)
-				{
-					this.addChild(this.m_hexes[r][c]);
+			m_hexes = new Vector.<Vector.<HexTile>>(m_height);
+			for(r = 0; r < m_height; r++) {
+				m_hexes[r] = new Vector.<HexTile>(m_width);
+				for(c = 0; c < m_width; c++) {
+					m_hexes[r][c] = new HexTile(this, emitter, data[r][c], c, r);
+					addChild(m_hexes[r][c]);
 				}
 			}
 			
-			addEventListener(MouseEvent.CLICK, onClick);
+			addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+		
+		private function init(e:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE, init);
+			stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
 		private function onClick(e:MouseEvent):void {
 			var clickedHex:HexTile = getHexAtCoordinates(mouseX, mouseY);
 			
 			if(clickedHex != null) {
-				//temporary code:
-				clickedHex.type = HexTile.EXCAVATED;
+				//TODO: Move this to the player class.
+				switch(clickedHex.type) {
+					case HexTile.FILLED:
+						if(energyGauge.energyLevel >= 12) {
+							energyGauge.energyLevel -= 12;
+							clickedHex.type = HexTile.EXCAVATED;
+						}
+						break;
+					case HexTile.EXCAVATED:
+						if(energyGauge.energyLevel >= 4) {
+							energyGauge.energyLevel -= 4;
+							clickedHex.type = HexTile.VALVE_CLOSED;
+						}
+						break;
+					case HexTile.VALVE_OPEN:
+						clickedHex.type = HexTile.VALVE_CLOSED;
+						break;
+					case HexTile.VALVE_CLOSED:
+						clickedHex.type = HexTile.VALVE_OPEN;
+						break;
+					default:
+				}
 			}
 		}
 		
@@ -153,6 +181,17 @@ package entropy
 			return getHex(int(column), int(row));
 		}
 		
+		private var tileBuffer:Vector.<HexTile> = new Vector.<HexTile>(6);
+		public function getHexesAround(column:int, row:int):Vector.<HexTile>
+		{
+			tileBuffer[0] = getHexAbove(column, row);
+			tileBuffer[1] = getHexAboveLeft(column, row);
+			tileBuffer[2] = getHexBelowLeft(column, row);
+			tileBuffer[3] = getHexBelow(column, row);
+			tileBuffer[4] = getHexBelowRight(column, row);
+			tileBuffer[5] = getHexAboveRight(column, row);
+			return tileBuffer;
+		}
 		
 		public function getHexAbove(column:int, row:int):HexTile
 		{
@@ -194,26 +233,5 @@ package entropy
 			}
 			return this.getHex(column + 1, row);
 		}
-		
-		
-		/*
-		private function readData(data:Vector.<Vector.<HexTile>>):Vector.<Vector.<HexTile>>
-		{
-			//return new Vector.<Vector.<HexTile>>();
-			
-		}
-		*/
-		
-		private function attachHexes(em:GasEmitter):void
-		{
-			for (var i:uint = 0; i < this.m_hexes.length; i++)
-			{
-				for (var k:uint = 0; k < this.m_hexes[i].length; k++ )
-				{
-					(this.m_hexes[i][k]).preInit(this, em);
-				}
-			}
-		}
-		
 	}
 }

@@ -1,9 +1,6 @@
 package entropy 
 {
 	import flash.display.Sprite;
-	import fl.controls.Button;
-	import fl.controls.Label;
-	import fl.controls.TextInput;
 	import flash.errors.IOError;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;

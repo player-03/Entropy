@@ -14,11 +14,11 @@ package entropy {
 		 */
 		private static const UNIT_HEXAGON_POINTS:Vector.<Point> = Vector.<Point>([
 				new Point(1, 0), //right
-				new Point(0.5, SQRT_3_2), //lower right
-				new Point(-0.5, SQRT_3_2), //lower left
-				new Point(-1, 0), //left
+				new Point(0.5, -SQRT_3_2), //upper right
 				new Point(-0.5, -SQRT_3_2), //upper left
-				new Point(0.5, -SQRT_3_2)]); //upper right
+				new Point(-1, 0), //left
+				new Point(-0.5, SQRT_3_2), //lower left
+				new Point(0.5, SQRT_3_2)]); //lower right
 		
 		private var centerX:Number;
 		private var centerY:Number;
@@ -36,14 +36,11 @@ package entropy {
 		private var apothem:Number;
 		
 		/**
-		 * Whether this will collide with particles.
-		 */
-		public var collisionEnabled:Boolean = true;
-		
-		/**
 		 * @param	radius The distance from the center to a corner.
 		 */
 		public function HexagonZone(centerX:Number = 0, centerY:Number = 0, radius:Number = 0) {
+			super();
+			
 			this.centerX = centerX;
 			this.centerY = centerY;
 			
@@ -61,6 +58,11 @@ package entropy {
 				points[i].x = points[i].x * radius + centerX;
 				points[i].y = points[i].y * radius + centerY;
 			}
+			placeWalls(points);
+		}
+		
+		protected function placeWalls(points:Vector.<Point>):void {
+			var i:int;
 			for(i = 0; i < 6; i++) {
 				addZone(new LineZone(points[i], points[i == 5 ? 0 : i + 1]));
 				
@@ -102,10 +104,6 @@ package entropy {
 		}
 		
 		public override function collideParticle(particle:Particle2D, bounce:Number = 1):Boolean {
-			if(!collisionEnabled) {
-				return false;
-			}
-			
 			var xDiff:Number = particle.x - centerX;
 			var yDiff:Number = particle.y - centerY;
 			
