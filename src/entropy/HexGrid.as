@@ -73,6 +73,15 @@ package entropy
 			//stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
+		public function cleanUp():void {
+			var r:int, c:int;
+			for(r = 0; r < m_height; r++) {
+				for(c = 0; c < m_width; c++) {
+					m_hexes[r][c].type = HexTile.SPACE;
+				}
+			}
+		}
+		
 		/**
 		 * @return The x coordinate of a tile in the given column.
 		 */

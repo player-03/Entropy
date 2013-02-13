@@ -116,8 +116,12 @@ package entropy {
 		private function initMap(file:FileReference = null):void {
 			//reset everything
 			gauge.energyLevel = 60;
-			emitter.stop();
 			removeChildren();
+			
+			if(grid != null) {
+				grid.cleanUp();
+			}
+			emitter.stop();
 			
 			//load the level
 			if(file != null) {
