@@ -87,6 +87,10 @@ package entropy {
 		private static var Filled:Class;
 		private static var filledBitmapData:BitmapData;
 		
+		[Embed(source="../../lib/img/GasDeposit.png")]
+		private static var GasDeposit:Class;
+		private static var gasDepositBitmapData:BitmapData;
+		
 		[Embed(source="../../lib/img/ValveClosed.png")]
 		private static var ValveClosed:Class;
 		private static var valveClosedBitmapData:BitmapData;
@@ -113,6 +117,11 @@ package entropy {
 						filledBitmapData = ((Bitmap) (new Filled())).bitmapData;
 					}
 					return filledBitmapData;
+				case GAS_DEPOSIT:
+					if(gasDepositBitmapData == null) {
+						gasDepositBitmapData = ((Bitmap) (new GasDeposit())).bitmapData;
+					}
+					return gasDepositBitmapData;
 				case VALVE_CLOSED:
 					if(valveClosedBitmapData == null) {
 						valveClosedBitmapData = ((Bitmap) (new ValveClosed())).bitmapData;

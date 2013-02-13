@@ -2,6 +2,7 @@ package entropy
 {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.display.Stage;
 	import flash.events.Event;
@@ -19,14 +20,16 @@ package entropy
 	
 	public class Player extends Sprite
 	{
-		private var player:Sprite;
+		[Embed(source="../../lib/img/RobotTop.png")]
+		private var TopImage:Class;
+		[Embed(source="../../lib/img/RobotSide.png")]
+		private var SideImage:Class;
 		
 		public var energyGauge:EnergyGauge;
 		
 		public var hex:HexGrid;
 		
 		[Embed(source="../../lib/robotmove.mp3")]
-		
 		private var moveSound:Class;
 		private var moveSounds:Sound;
 
@@ -36,11 +39,10 @@ package entropy
 			
 			mouseEnabled = false;
 			mouseChildren = false;
-			player = createAvatar(0xFFFF00);
-			addChild(player);
+			addChild(createAvatar());
 			
-			player.x = 300;
-			player.y = 200;
+			x = 300;
+			y = 200;
 			
 			moveSounds = new moveSound() as Sound; 			     
 			
@@ -49,16 +51,16 @@ package entropy
 		}
 		
 		private function addedToStageHandler(e:Event):void {
-			this.stage.addEventListener(MouseEvent.CLICK, mousePressedDown);
+			stage.addEventListener(MouseEvent.CLICK, mousePressedDown);
 		}
 		
 		private function mousePressedDown(event:MouseEvent):void {
-			var clickedHex:HexTile = hex.getHexAtCoordinates(mouseX, mouseY);
+			var clickedHex:HexTile = hex.getHexAtCoordinates(hex.mouseX, hex.mouseY);
 			if(clickedHex == null) {
 				return;
 			}
 			
-			var playerHex:HexTile = hex.getHexAtCoordinates(player.x, player.y);
+			var playerHex:HexTile = hex.getHexAtCoordinates(x, y);
 			
 			var check:Vector.<HexTile>;
 			check =	hex.getHexesAround(playerHex.column, playerHex.row);
@@ -112,8 +114,8 @@ package entropy
 			}
 			
 			if(!HexTile.typeIsSolid(clickedHex.type)) {
-				player.x = HexGrid.columnToX(clickedHex.column);
-				player.y = HexGrid.columnRowToY(clickedHex.column, clickedHex.row);
+				x = HexGrid.columnToX(clickedHex.column);
+				y = HexGrid.columnRowToY(clickedHex.column, clickedHex.row);
 				moveSounds.play();
 				
 				if(playerHex.type == HexTile.VALVE_TEMPORARILY_OPEN) {
@@ -122,9 +124,13 @@ package entropy
 			}
 		}
 		
-		private function createAvatar(bgColor:uint):Sprite {
-		  var s:Sprite = new Sprite();
-		  s.graphics.beginFill(bgColor);
+		private function createAvatar():DisplayObject {
+			var image:Bitmap = new TopImage() as Bitmap;
+			image.x = -image.width / 2;
+			image.y = -image.height / 2;
+			return image;
+		 /* var s:Sprite = new Sprite();
+		  s.graphics.beginFill(0xFFFF00);
 		  s.graphics.drawCircle(0, 0, 10);
 		  s.graphics.endFill();
 		  s.graphics.beginFill(0x000000);
@@ -134,7 +140,7 @@ package entropy
 			//this will define the start point of the curve
 			//the first two numbers are your control point for the curve
 			//the last two are the end point of the curve
-		  return s;
+		  return s;*/
 		}
 	}
 
