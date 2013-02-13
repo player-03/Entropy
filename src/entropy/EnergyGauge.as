@@ -12,14 +12,14 @@ package entropy {
 		private var rectHeight:Number;
 		
 		public function EnergyGauge(rectWidth:Number, rectHeight:Number,
-									initialEnergy:Number, maxEnergy:Number) {
+									maxEnergy:Number) {
 			super();
 			
 			this.rectWidth = rectWidth;
 			this.rectHeight = rectHeight;
 			this.maxEnergy = maxEnergy;
 			
-			energyLevel = initialEnergy;
+			energyLevel = 0;
 		}
 		
 		public function addEnergy(energy:Number):void {

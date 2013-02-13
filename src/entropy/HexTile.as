@@ -71,6 +71,11 @@ package entropy {
 		public static const VALVE_OPEN:uint = 5;
 		
 		/**
+		 * Like VALVE_OPEN, but will close automatically behind the player.
+		 */
+		public static const VALVE_TEMPORARILY_OPEN:uint = 9;
+		
+		/**
 		 * Collects energy when gas particles pass through in the same
 		 * direction. Slows, but does not block, the particles as it does.
 		 */
@@ -114,6 +119,7 @@ package entropy {
 					}
 					return valveClosedBitmapData;
 				case VALVE_OPEN:
+				case VALVE_TEMPORARILY_OPEN:
 					if(valveOpenBitmapData == null) {
 						valveOpenBitmapData = ((Bitmap) (new ValveOpen())).bitmapData;
 					}
@@ -170,7 +176,6 @@ package entropy {
 			mRow = row;
 			
 			setTypeWithoutSideEffects(type);
-			
 			
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
@@ -250,13 +255,13 @@ package entropy {
 				mEmitter.removeAction(turbineAction);
 				turbineAction = null;
 			}
+			if(collisionZone != null) {
+				mEmitter.removeAction(collisionZone);
+				collisionZone = null;
+			}
 			
 			//add or rebuild a hexagon collision zone for solid tile types
 			if(typeIsSolid(mType)) {
-				if(collisionZone != null) {
-					mEmitter.removeAction(collisionZone);
-				}
-				
 				collisionZone = new CollisionZone( 
 								new HexagonZone(HexGrid.columnToX(column),
 												HexGrid.columnRowToY(column, row),
@@ -267,10 +272,6 @@ package entropy {
 			//add a custom collision zone and a custom friction action
 			//for turbine tiles
 			else if(typeIsTurbine(mType)) {
-				if(collisionZone != null) {
-					mEmitter.removeAction(collisionZone);
-				}
-				
 				collisionZone = new CollisionZone(
 								new TurbineWalls(HexGrid.columnToX(column),
 												HexGrid.columnRowToY(column, row),
@@ -295,11 +296,6 @@ package entropy {
 													HexGrid.columnRowToY(column, row)),
 											TILE_WIDTH / 4));
 				mEmitter.addAction(turbineAction);
-			} else {
-				if(collisionZone != null) {
-					mEmitter.removeAction(collisionZone);
-					collisionZone = null;
-				}
 			}
 		}
 		

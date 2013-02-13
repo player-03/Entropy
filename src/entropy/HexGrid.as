@@ -73,35 +73,6 @@ package entropy
 			//stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
-		/*private function onClick(e:MouseEvent):void {
-			var clickedHex:HexTile = getHexAtCoordinates(mouseX, mouseY);
-			
-			if(clickedHex != null) {
-				//TODO: Move this to the player class.
-				switch(clickedHex.type) {
-					case HexTile.FILLED:
-						if(energyGauge.energyLevel >= 12) {
-							energyGauge.energyLevel -= 12;
-							clickedHex.type = HexTile.EXCAVATED;
-						}
-						break;
-					case HexTile.EXCAVATED:
-						if(energyGauge.energyLevel >= 4) {
-							energyGauge.energyLevel -= 4;
-							clickedHex.type = HexTile.VALVE_CLOSED;
-						}
-						break;
-					case HexTile.VALVE_OPEN:
-						clickedHex.type = HexTile.VALVE_CLOSED;
-						break;
-					case HexTile.VALVE_CLOSED:
-						clickedHex.type = HexTile.VALVE_OPEN;
-						break;
-					default:
-				}
-			}
-		}*/
-		
 		/**
 		 * @return The x coordinate of a tile in the given column.
 		 */
