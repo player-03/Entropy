@@ -35,7 +35,15 @@ package entropy {
 		 * The renderer manages and renders the particle system.
 		 */
 		private var renderer:BitmapRenderer;
+
+		private var player:Sprite;
 		
+		private var wallShape:Vector.<Point>;
+		private var wallContainer:Sprite;
+		
+		[Embed(source="../../lib/img/Wall.png")]
+		private var Wall:Class;
+
 		/**
 		 * Currently the only emitter, because using multiple emitters
 		 * would require registering the same collision data with each
@@ -47,6 +55,9 @@ package entropy {
 		 * A "container" display object is intended to hold multiple objects
 		 * of the same type, so that they all get drawn as a group.
 		 */
+
+		private var wallImage:BitmapData;
+
 		private var grid:HexGrid;
 		private var reader:LevelReader;
 		private var title:titleScreen;
@@ -94,6 +105,9 @@ package entropy {
 			//add children in the order they should be drawn
 			addChild(renderer);
 			addChild(grid);
+			
+			player = new Player();
+			addChild(player);
 		}
 		
 		private function initTitle():void
