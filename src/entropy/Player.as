@@ -6,12 +6,19 @@ package entropy
 	import flash.display.Stage;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
+	import flash.ui.Mouse;
 	import flash.ui.Keyboard;
+	import entropy.HexGrid;
+	import entropy.HexTile;
+	import entropy.HexagonZone;
 	
 	
 	public class Player extends Sprite
 	{
 		private var player:Sprite;
+		
+		private var hex:HexGrid;
 		
 		public function Player() 
 		{
@@ -21,29 +28,16 @@ package entropy
 			player.x = 200;
 			player.y = 100;
 			addChild(player);
+			
+			
 		}
 		
 		private function addedToStageHandler(e:Event):void {
-			this.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyPressedDown);
+			this.stage.addEventListener(MouseEvent.CLICK, mousePressedDown);
 		}
 		
-		private function keyPressedDown(event:KeyboardEvent):void {
-		  var key:uint = event.keyCode;
-		  var step:uint = 5
-		  switch (key) {
-			  case Keyboard.LEFT :
-				player.x -= step;
-				break;
-			  case Keyboard.RIGHT :
-				player.x += step;
-				break;
-			  case Keyboard.UP :
-				player.y -= step;
-				break;
-			  case Keyboard.DOWN :
-				player.y += step;
-				break;
-		  }
+		private function mousePressedDown(event:MouseEvent):void {
+
 		}
 		
 		private function createAvatar(bgColor:uint):Sprite {
