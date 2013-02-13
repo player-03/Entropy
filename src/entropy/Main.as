@@ -96,7 +96,6 @@ package entropy {
 				var loadedData:Vector.<Vector.<HexTile>> = null;
 				reader = new LevelReader(title.reference);
 				loadedData = reader.fileToVector(10, 5);
-				
 				grid = new HexGrid(emitter, 10, 5, -1, loadedData);
 			}
 			else

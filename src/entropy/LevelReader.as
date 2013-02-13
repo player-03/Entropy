@@ -83,19 +83,47 @@ package entropy
 		 */
 		public static function readMapFS(fVal:String, width:int = -1, height:int = -1 ):Vector.<Vector.<HexTile>>
 		{
-			//trace("valid string found");
-			//trace(fVal);
-			
+			trace("the size of the string for input is: " + fVal.length);
+			trace(fVal);
 			var placeHolder:Vector.<String> = new Vector.<String>();
-			placeHolder = new Vector.<String>(fVal.split(NEST2_DELIM));
-			return readMapFSV(placeHolder);
+			trace(fVal.split(NEST2_DELIM));
+			placeHolder = Vector.<String>(fVal.split(NEST2_DELIM));
+			var placeHolder2:Vector.<uint> = new Vector.<uint>(placeHolder.length);
+			//trace("the size of the vector for conversion is: " + placeHolder.length);
+			for (var i:uint = 0; i < placeHolder.length; i++)
+			{
+				placeHolder2[i] = uint(placeHolder[i]);
+			}
+			//trace("the size of the item of uints is: " + placeHolder2.length);
+			return readMapFSV(placeHolder2, width, height);
 		}
 		
-		public static function readMapFSV(fVal:Vector.<String>):Vector.<Vector.<HexTile>>
+		public static function readMapFSV(fVal:Vector.<uint>, width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
 		{
+			//first let's get the right indices
+			if (width < 1)
+				width = 1;
+			if (height < 1)
+				height = fVal.length % width;
+			while ( (height * width - width) > fVal.length)
+				height--;
+			trace("new height is now: " + height);
+			//now let's get our hextile vector
+			var rVal:Vector.<Vector.<HexTile>> = new Vector.<Vector.<HexTile>>(height);
+			for (var i:uint = 0; i < rVal.length; i++)
+				rVal[i] = new Vector.<HexTile>(width);
+			var row:int = 0;
+			var column:int = 0;
+			var lim:int = fVal.length
+			for (row = 0; row *width < lim && row < height; row++ )
+			{
+				for (column = 0; row * width + column < lim && column < width; column++)
+				{
+					rVal[row][column] = new HexTile(null, null, fVal[row*width+column], column, row);
+				}
+			}
 			
-			
-			return null;
+			return rVal;
 		}
 		
 		
@@ -159,7 +187,7 @@ package entropy
 			}
 			else
 			{
-				return readMapFS(placeHolder.substring(startIndex, endIndex));	
+				return readMapFS(placeHolder.substring(startIndex, endIndex), width, height);	
 			}
 		}
 		
@@ -203,6 +231,7 @@ package entropy
 		 */
 		public function fileToVector(width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
 		{
+			
 			if (this.m_file != null && this.m_file.data != null)
 			{
 				return LevelReader.readfileFF(this.m_file, width, height);
