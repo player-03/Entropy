@@ -140,7 +140,7 @@ package entropy {
 			
 			//collision data may be necessary for any tile type except
 			//space, so create the zone now
-			if(mType != SPACE) {
+			if(mType != SPACE && emitter != null) {
 				collisionZone = new HexagonZone(HexGrid.columnToX(column),
 												HexGrid.columnRowToY(column, row),
 												TILE_WIDTH / 2 - 2);
@@ -164,6 +164,28 @@ package entropy {
 				registerChangeListener(mGrid.getHexAboveRight(column, row));
 			}
 		}
+		
+		/**
+		 * call this before adding the hex grid to the stage
+		 */
+		public function preInit(inGrid:HexGrid, inEmitter:GasEmitter):void
+		{
+			this.mGrid = inGrid;
+			this.mEmitter = inEmitter;
+			if (mType != SPACE)
+			{
+				collisionZone = new HexagonZone(HexGrid.columnToX(column),
+													HexGrid.columnRowToY(column, row),
+													TILE_WIDTH / 2 - 2);
+				collisionZone.collisionEnabled = typeCollides(mType);
+				inEmitter.addAction(new CollisionZone(collisionZone));
+			}
+		}
+		
+		
+		
+		
+		
 		
 		private function registerChangeListener(h:HexTile):void {
 			if(h != null) {

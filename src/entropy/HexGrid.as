@@ -47,8 +47,11 @@ package entropy
 			}
 			else
 			{
-				m_hexes = readData(data);
+				m_hexes = data;//readData(data);
+				this.attachHexes(emitter);
 			}
+			
+			
 			
 			var r:int, c:int;
 			for (r = 0; r < height; r++)
@@ -193,15 +196,23 @@ package entropy
 		}
 		
 		
-		/**
-		 * 
-		 * @param	data, hextiles obtained from a file
-		 * @return the data formatted to the width and height of this hexgrid
-		 */
+		/*
 		private function readData(data:Vector.<Vector.<HexTile>>):Vector.<Vector.<HexTile>>
 		{
-			return new Vector.<Vector.<HexTile>>();
+			//return new Vector.<Vector.<HexTile>>();
 			
+		}
+		*/
+		
+		private function attachHexes(em:GasEmitter):void
+		{
+			for (var i:uint = 0; i < this.m_hexes.length; i++)
+			{
+				for (var k:uint = 0; k < this.m_hexes[i].length; k++ )
+				{
+					(this.m_hexes[i][k]).preInit(this, em);
+				}
+			}
 		}
 		
 	}
