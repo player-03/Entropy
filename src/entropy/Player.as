@@ -17,6 +17,9 @@ package entropy
 		{
 			this.addEventListener(Event.ADDED_TO_STAGE, addedToStageHandler);
 			
+			mouseEnabled = false;
+			mouseChildren = false;
+			visible = false;
 			player = createAvatar(0xFFFF00);
 			player.x = 200;
 			player.y = 100;

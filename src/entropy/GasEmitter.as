@@ -21,7 +21,7 @@ package entropy {
 	 * subsequent behavior.
 	 */
 	public class GasEmitter extends Emitter2D {
-		private static const OFFSCREEN_LEEWAY:Number = 200;
+		private static const OFFSCREEN_LEEWAY:Number = 100;
 		
 		[Embed(source="../../lib/img/GasParticle.png")]
 		private var GasParticle:Class;
@@ -46,7 +46,6 @@ package entropy {
 			counter = blast;
 			
 			var image:Bitmap = new GasParticle() as Bitmap;
-			image.scaleX = image.scaleY = 0.2;
 			
 			//center the image
 			image.x = -image.width / 2;
@@ -75,7 +74,7 @@ package entropy {
 			addAction(new Collide());
 			
 			//add gravity
-			addAction(new GravityWell(50, Main.STAGE_WIDTH / 2, Main.STAGE_HEIGHT / 2, 300));
+			addAction(new GravityWell(10, Main.STAGE_WIDTH / 2, Main.STAGE_HEIGHT / 2, 300));
 			
 			//remove particles that go too far offscreen
 			addAction(new DeathZone(new RectangleZone(-OFFSCREEN_LEEWAY, -OFFSCREEN_LEEWAY,

@@ -3,6 +3,7 @@ package entropy
 	import entropy.HexTile;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.utils.ByteArray;
 	import org.flintparticles.common.emitters.Emitter;
@@ -18,7 +19,10 @@ package entropy
 		private var m_width:int;
 		private var m_height:int;
 		
-		public function HexGrid(emitter:GasEmitter, width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<HexTile>> = null)
+		public var energyGauge:EnergyGauge;
+		
+		public function HexGrid(emitter:GasEmitter, energyGauge:EnergyGauge,
+						width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<HexTile>> = null)
 		{
 			super();
 			
@@ -32,6 +36,8 @@ package entropy
 			m_asteroidCenterX = m_width >> 1;
 			m_asteroidCenterY = columnRowToY(m_asteroidCenterX, m_height >> 1);
 			m_asteroidCenterX = columnToX(m_asteroidCenterX);
+			
+			this.energyGauge = energyGauge;
 			
 			if(asteroidRadius < 1) {
 				asteroidRadius = Math.min(m_asteroidCenterX, m_asteroidCenterY);
@@ -59,15 +65,40 @@ package entropy
 				}
 			}
 			
-			addEventListener(MouseEvent.CLICK, onClick);
+			addEventListener(Event.ADDED_TO_STAGE, init);
+		}
+		
+		private function init(e:Event):void {
+			removeEventListener(Event.ADDED_TO_STAGE, init);
+			stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
 		private function onClick(e:MouseEvent):void {
 			var clickedHex:HexTile = getHexAtCoordinates(mouseX, mouseY);
 			
 			if(clickedHex != null) {
-				//temporary code:
-				clickedHex.type = HexTile.EXCAVATED;
+				//TODO: Move this to the player class.
+				switch(clickedHex.type) {
+					case HexTile.FILLED:
+						if(energyGauge.energyLevel >= 12) {
+							energyGauge.energyLevel -= 12;
+							clickedHex.type = HexTile.EXCAVATED;
+						}
+						break;
+					case HexTile.EXCAVATED:
+						if(energyGauge.energyLevel >= 4) {
+							energyGauge.energyLevel -= 4;
+							clickedHex.type = HexTile.VALVE_CLOSED;
+						}
+						break;
+					case HexTile.VALVE_OPEN:
+						clickedHex.type = HexTile.VALVE_CLOSED;
+						break;
+					case HexTile.VALVE_CLOSED:
+						clickedHex.type = HexTile.VALVE_OPEN;
+						break;
+					default:
+				}
 			}
 		}
 		
@@ -150,6 +181,17 @@ package entropy
 			return getHex(int(column), int(row));
 		}
 		
+		private var tileBuffer:Vector.<HexTile> = new Vector.<HexTile>(6);
+		public function getHexesAround(column:int, row:int):Vector.<HexTile>
+		{
+			tileBuffer[0] = getHexAbove(column, row);
+			tileBuffer[1] = getHexAboveLeft(column, row);
+			tileBuffer[2] = getHexBelowLeft(column, row);
+			tileBuffer[3] = getHexBelow(column, row);
+			tileBuffer[4] = getHexBelowRight(column, row);
+			tileBuffer[5] = getHexAboveRight(column, row);
+			return tileBuffer;
+		}
 		
 		public function getHexAbove(column:int, row:int):HexTile
 		{

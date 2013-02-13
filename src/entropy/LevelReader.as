@@ -193,9 +193,11 @@ package entropy
 					if(Math.random() < 0.08) {
 						return HexTile.GAS_DEPOSIT;
 					} else if(Math.random() < 0.04) {
-						return HexTile.VALVE_CLOSED;
+						return HexTile.TURBINE_VERTICAL;
 					} else if(Math.random() < 0.04) {
-						return HexTile.TURBINE;
+						return HexTile.TURBINE_BOTTOM_LEFT_TO_TOP_RIGHT;
+					} else if(Math.random() < 0.04) {
+						return HexTile.TURBINE_TOP_LEFT_TO_BOTTOM_RIGHT;
 					}
 				}
 				return HexTile.FILLED;
