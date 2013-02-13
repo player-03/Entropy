@@ -22,7 +22,7 @@ package entropy
 		public var energyGauge:EnergyGauge;
 		
 		public function HexGrid(emitter:GasEmitter, energyGauge:EnergyGauge,
-						width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<HexTile>> = null)
+						width:int, height:int = -1, asteroidRadius:Number = -1, data:Vector.<Vector.<uint>> = null)
 		{
 			super();
 			
@@ -46,22 +46,19 @@ package entropy
 			
 			var gasRadiusSquared:Number = (asteroidRadius - HexTile.TILE_WIDTH) * (asteroidRadius - HexTile.TILE_WIDTH);
 			
+			
 			if (data === null || data.length < 1 || data[0].length < 1)
 			{
-				m_hexes = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY,
-					m_asteroidRadiusSquared, gasRadiusSquared, this, emitter);
+				data = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY,
+					m_asteroidRadiusSquared, gasRadiusSquared);
 			}
-			else
-			{
-				m_hexes = readData(data);
-			}
-			
 			var r:int, c:int;
-			for (r = 0; r < height; r++)
-			{
-				for (c = 0; c < width; c++)
-				{
-					this.addChild(this.m_hexes[r][c]);
+			m_hexes = new Vector.<Vector.<HexTile>>(m_height);
+			for(r = 0; r < m_height; r++) {
+				m_hexes[r] = new Vector.<HexTile>(m_width);
+				for(c = 0; c < m_width; c++) {
+					m_hexes[r][c] = new HexTile(this, emitter, data[r][c], c, r);
+					addChild(m_hexes[r][c]);
 				}
 			}
 			
@@ -233,18 +230,5 @@ package entropy
 			}
 			return this.getHex(column + 1, row);
 		}
-		
-		
-		/**
-		 * 
-		 * @param	data, hextiles obtained from a file
-		 * @return the data formatted to the width and height of this hexgrid
-		 */
-		private function readData(data:Vector.<Vector.<HexTile>>):Vector.<Vector.<HexTile>>
-		{
-			return new Vector.<Vector.<HexTile>>();
-			
-		}
-		
 	}
 }

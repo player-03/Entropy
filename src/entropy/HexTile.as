@@ -171,7 +171,7 @@ package entropy {
 			
 			setTypeWithoutSideEffects(type);
 			
-			//run some actions later, after 
+			
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
