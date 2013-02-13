@@ -47,11 +47,14 @@ package entropy
 			var gasRadiusSquared:Number = (asteroidRadius - HexTile.TILE_WIDTH) * (asteroidRadius - HexTile.TILE_WIDTH);
 			
 			
-			if (data === null || data.length < 1 || data[0].length < 1)
-			{
+			if (data === null || data.length < 1 || data[0].length < 1) {
 				data = LevelReader.randMap(m_height, m_width, m_asteroidCenterX, m_asteroidCenterY,
 					m_asteroidRadiusSquared, gasRadiusSquared);
+			} else {
+				m_height = data.length;
+				m_width = data[0].length;
 			}
+			
 			var r:int, c:int;
 			m_hexes = new Vector.<Vector.<HexTile>>(m_height);
 			for(r = 0; r < m_height; r++) {
