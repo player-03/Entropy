@@ -131,7 +131,7 @@ package entropy
 		 * @param	fVal the file reference whose data will be read
 		 * @return the map from the file
 		 */
-		public static function readfileFF(fVal:FileReference, width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
+		public static function readMapFF(fVal:FileReference, width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
 		{
 			trace("reading file");
 			var placeHolder:String = String(fVal.data);
@@ -234,7 +234,7 @@ package entropy
 			
 			if (this.m_file != null && this.m_file.data != null)
 			{
-				return LevelReader.readfileFF(this.m_file, width, height);
+				return LevelReader.readMapFF(this.m_file, width, height);
 			}
 			else
 			{
@@ -242,6 +242,8 @@ package entropy
 				return null;
 			}
 		}
+		
+		
 		
 		
 	
