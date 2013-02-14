@@ -81,7 +81,7 @@ package entropy
 		 * @param	fVal the string representing the footer of the read file, the map in text format
 		 * @return	the map from the file
 		 */
-		public static function readMapFS(fVal:String, width:int = -1, height:int = -1 ):Vector.<Vector.<HexTile>>
+		public static function readMapFS(fVal:String, width:int = -1, height:int = -1 ):Vector.<Vector.<uint>>
 		{
 			trace("the size of the string for input is: " + fVal.length);
 			trace(fVal);
@@ -98,7 +98,8 @@ package entropy
 			return readMapFSV(placeHolder2, width, height);
 		}
 		
-		public static function readMapFSV(fVal:Vector.<uint>, width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
+		public static function readMapFSV(fVal:Vector.<uint>,
+							width:int = -1, height:int = -1):Vector.<Vector.<uint>>
 		{
 			//first let's get the right indices
 			if (width < 1)
@@ -109,9 +110,9 @@ package entropy
 				height--;
 			trace("new height is now: " + height);
 			//now let's get our hextile vector
-			var rVal:Vector.<Vector.<HexTile>> = new Vector.<Vector.<HexTile>>(height);
+			var rVal:Vector.<Vector.<uint>> = new Vector.<Vector.<uint>>(height);
 			for (var i:uint = 0; i < rVal.length; i++)
-				rVal[i] = new Vector.<HexTile>(width);
+				rVal[i] = new Vector.<uint>(width);
 			var row:int = 0;
 			var column:int = 0;
 			var lim:int = fVal.length
@@ -119,7 +120,7 @@ package entropy
 			{
 				for (column = 0; row * width + column < lim && column < width; column++)
 				{
-					rVal[row][column] = new HexTile(null, null, fVal[row*width+column], column, row);
+					rVal[row][column] = fVal[row*width+column];
 				}
 			}
 			
@@ -131,7 +132,7 @@ package entropy
 		 * @param	fVal the file reference whose data will be read
 		 * @return the map from the file
 		 */
-		public static function readMapFF(fVal:FileReference, width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
+		public static function readfileFF(fVal:FileReference, width:int = -1, height:int = -1):Vector.<Vector.<uint>>
 		{
 			trace("reading file");
 			var placeHolder:String = String(fVal.data);
@@ -197,7 +198,7 @@ package entropy
 	
 		public static function randMap(height:int, width:int,
 						asteroidCenterX:int, asteroidCenterY:int,
-						aRadSq:Number, gRadSq:Number, grid:HexGrid, emitter:GasEmitter):Vector.<Vector.<HexTile>>
+						aRadSq:Number, gRadSq:Number):Vector.<Vector.<uint>>
 		{
 			if (height < 0)
 			{
@@ -212,15 +213,15 @@ package entropy
 				return null;
 			}
 			var r:int, c:int;
-			var result:Vector.<Vector.<HexTile>> = new Vector.<Vector.<HexTile>>(height)
-			var row:Vector.<HexTile>;
+			var result:Vector.<Vector.<uint>> = new Vector.<Vector.<uint>>(height);
+			var row:Vector.<uint>;
 			for (r = 0; r < height; r++)
 			{
-				row = new Vector.<HexTile>(width);
+				row = new Vector.<uint>(width);
 				result[r] = row;
 				for (c = 0; c < width; c++)
 				{
-					row[c] = new HexTile(grid, emitter, LevelReader.getTileType(c, r, aRadSq, gRadSq, asteroidCenterX, asteroidCenterY), c, r);
+					row[c] = getTileType(c, r, aRadSq, gRadSq, asteroidCenterX, asteroidCenterY);
 				}
 			}
 			return result;
@@ -229,12 +230,12 @@ package entropy
 		/**
 		 * @return A 2-dimensional vector representing the map to be used from the member file reference
 		 */
-		public function fileToVector(width:int = -1, height:int = -1):Vector.<Vector.<HexTile>>
+		public function fileToVector(width:int = -1, height:int = -1):Vector.<Vector.<uint>>
 		{
 			
 			if (this.m_file != null && this.m_file.data != null)
 			{
-				return LevelReader.readMapFF(this.m_file, width, height);
+				return LevelReader.readfileFF(this.m_file, width, height);
 			}
 			else
 			{
@@ -242,8 +243,6 @@ package entropy
 				return null;
 			}
 		}
-		
-		
 		
 		
 	
@@ -267,9 +266,11 @@ package entropy
 					if(Math.random() < 0.08) {
 						return HexTile.GAS_DEPOSIT;
 					} else if(Math.random() < 0.04) {
-						return HexTile.VALVE_CLOSED;
+						return HexTile.TURBINE_VERTICAL;
 					} else if(Math.random() < 0.04) {
-						return HexTile.TURBINE;
+						return HexTile.TURBINE_BOTTOM_LEFT_TO_TOP_RIGHT;
+					} else if(Math.random() < 0.04) {
+						return HexTile.TURBINE_TOP_LEFT_TO_BOTTOM_RIGHT;
 					}
 				}
 				return HexTile.FILLED;
